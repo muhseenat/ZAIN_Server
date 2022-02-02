@@ -6,10 +6,23 @@ const accountSID = "AC446a96938c974832f639def16975ba75";
 const authToken = "d69abd11d90c7a95664a22d619f8311c";
 const client = require("twilio")(accountSID, authToken);
 
-const registerUser = (req, res) => {
+
+//User Register API
+const registerUser = async (req, res) => {
   console.log("wowww");
+  console.log(req.body);
 
   const { name, email, phone, password, passwordVerify } = req.body;
+  if (password.length < 6) {
+    return res.status(400).json({ errorMessage: "Enter minimum 6 characters" });
+  }
+  if (phone.length > 10 || phone.length < 10) {
+    return res.status(400).json({ errorMessage: "Enter correct phone number" });
+  }
+  if (password !== passwordVerify) {
+    return res.status(400).json({ errorMessage: "Enter the same password" });
+  }
+  console.log("ethiiiiiiiiii");
 
   User.findOne({ email }).exec((error, user) => {
     if (user)
@@ -17,23 +30,24 @@ const registerUser = (req, res) => {
         .status(400)
         .json({ errorMessage: "This Email is already taken" });
   });
-
-  newUser.save((error, data) => {
+  console.log("errorrr lllllaaaaaaa");
+  const newUser = new User({ name, email, phone, password });
+  console.log(newUser);
+  await newUser.save((error, data) => {
     if (error) {
       return res.status(400).json({ errorMessage: "Something went wrong" });
     }
     if (data) {
-      const token = jwt.sign(
-        { user: data._id, isAdmin: user.isAdmin },
-        process.env.JWT_SECRET_KEY,
-        { expiresIn: "2d" }
-      );
+      const token = jwt.sign({ user: data._id }, process.env.JWT_SECRET_KEY, {
+        expiresIn: "2d",
+      });
       console.log(token + "token ithannnnnn");
-      return res.status(201).json({ token, data });
+      return res.status(200).json({ token, data });
     }
   });
 };
 
+//User Login API
 const loginUser = (req, res) => {
   const { email, password } = req.body;
   User.findOne({ email }).exec((error, user) => {
@@ -65,6 +79,8 @@ const loginUser = (req, res) => {
   });
 };
 
+
+//OTP Send API
 const otpSend = (req, res) => {
   const phone = req.body.number;
   console.log(phone);
@@ -91,8 +107,10 @@ const otpSend = (req, res) => {
   });
 };
 
+
+// OTP Verify API
 const otpVerify = (req, res) => {
-  console.log(req.body + "ithannn request");
+  console.log(req.body);
   const { otp, number } = req.body;
   const phone = req.body.number;
   console.log(otp, phone);
@@ -122,11 +140,39 @@ const otpVerify = (req, res) => {
             console.log(user);
             return res.status(200).json({ token, user });
           }
-        });
+        }).catch((error)=>{
+          res.status(400).json({errorMessage:'Invalid OTP'})
+        })
     } else {
       return res.status(400).json({ errorMessage: "Invalid OTP" });
     }
   });
 };
 
-module.exports = { registerUser, loginUser, otpSend, otpVerify }
+
+
+//Admin Login API
+
+const adminLogin = (req, res) => {
+  console.log(req.body);
+  try {
+    const { email, password } = req.body;
+    if (!email || !password) {
+      return res.status(400).json({ errorMessage: "All fields are required" });
+    }
+    if (email === "admin@new" && password === "123456") {
+      const admin = true;
+      const adminToken = jwt.sign({ admin: true }, process.env.JWT_SECRET_KEY);
+      console.log(adminToken);
+
+      return res.status(200).json({ adminToken, admin });
+    } else {
+      return res.status(401).json({ errorMessage: "Wrong email or password" });
+    }
+  } catch (error) {
+    console.log(error);
+    res.status(500).send();
+  }
+};
+
+module.exports = { registerUser, loginUser, otpSend, otpVerify, adminLogin };

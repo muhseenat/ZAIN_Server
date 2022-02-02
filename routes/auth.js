@@ -8,10 +8,13 @@ router.post('/register',authControllers.registerUser);
 
 router.post('/login',authControllers.loginUser);
 
-router.post('/otpSend',authControllers.otpSend);
+router.post('/otpsend',authControllers.otpSend);
 
-router.post('/otpVerify',authControllers.otpVerify);
+// router.post('/otpverify',authControllers.otpVerify);
 
+router.post('/otpverify',authControllers.otpVerify)
+ 
+router.post('/admin/login',authControllers.adminLogin);
 
 
 

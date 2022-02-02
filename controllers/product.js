@@ -12,22 +12,18 @@ const addProduct = async (req, res) => {
     console.log(files);
     for (const file of files) {
       const { path } = file;
- 
+
       await cloudinary.uploader
         .upload(path, {
           resource_type: "auto",
           folder: "E-Commerce",
         })
         .then((result) => {
-       
           console.log(result);
           url.push({ url: result.url, id: result.public_id });
           console.log(url);
         });
     }
-
-
-  
 
     const data = JSON.parse(req.body.data);
 
