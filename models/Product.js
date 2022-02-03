@@ -45,7 +45,7 @@ const ProductSchema=new Schema({
     type:Array
   },
    size:{
-    type:String
+    type:Array
    },
    mainCategory:{
        type:String,

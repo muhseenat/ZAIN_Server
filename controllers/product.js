@@ -49,25 +49,42 @@ const addProduct = async (req, res) => {
     console.log(err);
   }
 };
-
+//GET SINGLE PRODUCT
 const getProductById = (req, res) => {
   Product.findById(req.params.id)
-    .then((data) => {
-      res.status(200).json({ data });
+    .then((product) => {
+      res.status(200).json({ product });
     })
     .catch((error) => {
       res.status(400).json({ error });
     });
 };
+//GET ALL PRODUCTS
 
-const getProduct = (req, res) => {
-  Product.find({}).exec((error, product) => {
-    if (error) return res.status(400).json({ error });
-    if (product) {
-      res.status(200).json({ product });
-    }
-  });
+const getProduct =async (req, res) => {
+    
+  const qNew =req.query.new;
+  const qCategory=req.query.category
+try {
+  let products;
+
+  if(qNew){
+    products = await Product.find().sort({createdAt:-1}).limit(5);
+  }else if(qCategory){
+    products=await Product.find({mainCategory:qCategory});
+  }else{
+    products = await Product.find();
+  }
+  res.status(200).json(products);
+} catch (error) {
+   res.status(400).json({error})
+}
+
+ 
 };
+
+
+
 
 const deleteProduct = async (req, res) => {
   try {
@@ -105,7 +122,7 @@ const updateProduct = async (req, res) => {
       size: req.body.size || product.size,
       category: req.body.category || product.category,
       images: [newProduct.secure_url] || product.images,
-      cloudinary_id: newProduct.public_id || product.cloudinary_id,
+
     };
     product = await Product.findByIdAndUpdate(
       (req.params.id, data, { new: true })
@@ -122,4 +139,5 @@ module.exports = {
   deleteProduct,
   updateProduct,
   getProductById,
+ 
 };
