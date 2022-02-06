@@ -111,7 +111,7 @@ const otpSend = (req, res) => {
 // OTP Verify API
 const otpVerify = (req, res) => {
   console.log(req.body);
-  const { otp, number } = req.body;
+  const { otp } = req.body;
   const phone = req.body.number;
   console.log(otp, phone);
   console.log("endhaaa pattiye");
@@ -143,9 +143,8 @@ const otpVerify = (req, res) => {
         }).catch((error)=>{
           res.status(400).json({errorMessage:'Invalid OTP'})
         })
-    } else {
-      return res.status(400).json({ errorMessage: "Invalid OTP" });
-    }
+    } 
+    
   });
 };
 

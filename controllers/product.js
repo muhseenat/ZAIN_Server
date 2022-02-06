@@ -44,7 +44,7 @@ const addProduct = async (req, res) => {
       img4: url[3],
     });
     await product.save();
-    res.status(201).json({ product });
+    res.status(200).json({ product });
   } catch (err) {
     console.log(err);
   }
@@ -61,35 +61,32 @@ const getProductById = (req, res) => {
 };
 //GET ALL PRODUCTS
 
-const getProduct =async (req, res) => {
-    
-  const qNew =req.query.new;
-  const qCategory=req.query.category
-try {
-  let products;
+const getProduct = async (req, res) => {
+  const qNew = req.query.new;
+  const qCategory = req.query.category;
+  try {
+    let products;
 
-  if(qNew){
-    products = await Product.find().sort({createdAt:-1}).limit(5);
-  }else if(qCategory){
-    products=await Product.find({mainCategory:qCategory});
-  }else{
-    products = await Product.find();
+    if (qNew) {
+      products = await Product.find().sort({ createdAt: -1 }).limit(5);
+    } else if (qCategory) {
+      products = await Product.find({ mainCategory: qCategory });
+    } else {
+      products = await Product.find();
+    }
+    res.status(200).json(products);
+  } catch (error) {
+    res.status(400).json({ error });
   }
-  res.status(200).json(products);
-} catch (error) {
-   res.status(400).json({error})
-}
-
- 
 };
-
-
-
-
+// DELETE PRODUCT API
 const deleteProduct = async (req, res) => {
   try {
-    let product = awaitProduct.findById(req.params.id);
-    await cloudinary.uploader.destroy(product.cloudinary_id);
+    let product = await Product.findById(req.params.id);
+    await cloudinary.uploader.destroy(product.img1[0].id);
+    await cloudinary.uploader.destroy(product.img2[0].id);
+    await cloudinary.uploader.destroy(product.img3[0].id);
+    await cloudinary.uploader.destroy(product.img4[0].id);
     await product.remove();
     res.status(200).json({ product });
   } catch (error) {
@@ -97,39 +94,56 @@ const deleteProduct = async (req, res) => {
     return res.status(400).json({ error });
   }
 };
-
+//UPDATE PRODUCT API
 const updateProduct = async (req, res) => {
   try {
-    let product = await Product.findById(req.params.id);
-    await cloudinary.uploader.destroy(product.cloudinary_id);
+    const url = [];
 
-    let newProduct = [];
-    if (req.files.length > 0) {
-      newProduct = req.files.map((file) => {
-        return file.filename;
-      });
+    const files = req.files;
+
+    for (const file of files) {
+      const { path } = file;
+
+      await cloudinary.uploader
+        .upload(path, {
+          resource_type: "auto",
+          folder: "E-Commerce",
+        })
+        .then((result) => {
+          url.push({ url: result.url, id: result.public_id });
+        });
     }
 
-    newProduct = await cloudinary.uploader.upload(req.files.path);
+    const data = JSON.parse(req.body.data);
+ 
 
-    const data = {
-      name: req.body.name || product.name,
-      slug: slugify(req.body.name) || slugify(product.name),
-      price: req.body.price || product.price,
-      description: req.body.description || product.description,
-      discount: req.body.discount || product.discount,
-      quantity: req.body.quantity || product.quantity,
-      size: req.body.size || product.size,
-      category: req.body.category || product.category,
-      images: [newProduct.secure_url] || product.images,
-
-    };
-    product = await Product.findByIdAndUpdate(
-      (req.params.id, data, { new: true })
-    );
-    res.status(200).json({ product });
+   let update_product= Product.updateOne(
+      { _id: req.params.id },
+      {
+        $set: {
+          name: data.productName,
+          slug: slugify(data.productName) ,
+          price: data.price ,
+          description: data.description ,
+          discount: data.discount ,
+          quantity: data.quantity ,
+          size: data.size,
+          mainCategory: data.selectedCategory ,
+          subCategory: data.selectedSubCategory,
+          img1: url[0] ,
+          img2: url[1],
+          img3: url[2] ,
+          img4: url[3] ,
+        },
+      }
+    )
+  
+   res.status(201).json({ update_product});
+     
+    
+    
   } catch (err) {
-    return res.status(400).json({ error });
+    return res.status(400).json({ err });
   }
 };
 
@@ -139,5 +153,4 @@ module.exports = {
   deleteProduct,
   updateProduct,
   getProductById,
- 
 };

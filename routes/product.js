@@ -10,8 +10,8 @@ const upload = require ("../config/multer");
 // router.post('/addProduct',productControllers.addProduct);
 router.post('/addProduct',upload.array('img'),productControllers.addProduct);
 router.get('/getproduct',productControllers.getProduct);
-router.delete('/deleteproduct',productControllers.deleteProduct);
-router.put('/updateproduct',productControllers.updateProduct);
+router.delete('/deleteproduct/:id',productControllers.deleteProduct);
+router.put('/updateproduct/:id',upload.array('img'),productControllers.updateProduct);
 router.get('/getproductbyid/:id',productControllers.getProductById);
 
 

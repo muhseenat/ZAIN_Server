@@ -10,7 +10,6 @@ router.post('/login',authControllers.loginUser);
 
 router.post('/otpsend',authControllers.otpSend);
 
-// router.post('/otpverify',authControllers.otpVerify);
 
 router.post('/otpverify',authControllers.otpVerify)
  
