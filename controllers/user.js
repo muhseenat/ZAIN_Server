@@ -90,3 +90,8 @@ module.exports = {
   updateUser,
   blockUser,
 };
+
+
+// const addADdress =(req,res)=>{
+//   User.updateOne({id:343434},{$set:{address:req.body}})
+// }

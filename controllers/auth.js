@@ -6,7 +6,6 @@ const accountSID = "AC446a96938c974832f639def16975ba75";
 const authToken = "d69abd11d90c7a95664a22d619f8311c";
 const client = require("twilio")(accountSID, authToken);
 
-
 //User Register API
 const registerUser = async (req, res) => {
   console.log("wowww");
@@ -22,7 +21,7 @@ const registerUser = async (req, res) => {
   if (password !== passwordVerify) {
     return res.status(400).json({ errorMessage: "Enter the same password" });
   }
-  console.log("ethiiiiiiiiii");
+ 
 
   User.findOne({ email }).exec((error, user) => {
     if (user)
@@ -30,55 +29,65 @@ const registerUser = async (req, res) => {
         .status(400)
         .json({ errorMessage: "This Email is already taken" });
   });
-  console.log("errorrr lllllaaaaaaa");
+ 
   const newUser = new User({ name, email, phone, password });
   console.log(newUser);
-  await newUser.save((error, data) => {
+  await newUser.save((error, user) => {
     if (error) {
       return res.status(400).json({ errorMessage: "Something went wrong" });
     }
-    if (data) {
+    if (user) {
       const token = jwt.sign({ user: data._id }, process.env.JWT_SECRET_KEY, {
         expiresIn: "2d",
       });
-      console.log(token + "token ithannnnnn");
-      return res.status(200).json({ token, data });
+      console.log(token + "token ithannnnnn" +user);
+      return res.status(200).json({ token, user });
     }
   });
 };
 
 //User Login API
-const loginUser = (req, res) => {
+const loginUser = async (req, res) => {
   const { email, password } = req.body;
-  User.findOne({ email }).exec((error, user) => {
-    if (error) return res.status(400).json({ error });
+ 
+ const user = await User.findOne({ email })
+  try {
+    
     if (user) {
+    
       if (user.status) {
+   
         if (user.authenticate(password)) {
           const token = jwt.sign(
             { user: user._id },
             process.env.JWT_SECRET_KEY,
             { expiresIn: "2d" }
           );
-          console.log(token + "login time token");
-          console.log(user);
+          
+        
           res.status(200).json({ token, user });
         } else {
-          return res
+       
+          res
             .status(400)
             .json({ errorMessage: `Email and Password not match` });
         }
       } else {
-        return res.status(400).json({ errorMessage: `Blocked by admin` });
+    
+        res.status(400).json({ errorMessage: `Blocked by admin` });
       }
     } else {
-      return res
-        .status(400)
+      res
+        .status(401)
         .json({ errorMessage: `You don't have an account.Please signup` });
     }
-  });
+  } 
+      catch (error) {
+     
+    res.status(400).json({error})
+      }  
+    
 };
-
 
 //OTP Send API
 const otpSend = (req, res) => {
@@ -97,16 +106,15 @@ const otpSend = (req, res) => {
         })
         .then((resp) => {
           console.log(resp + "otp povunnunddddd");
-          return res.status(200).json({ resp });
+         res.status(200).json({ resp });
         });
     } else {
-      return res
-        .status(400)
+       res
+        .status(401)
         .json({ errorMessage: `You don't have an account,Plz signup` });
     }
   });
 };
-
 
 // OTP Verify API
 const otpVerify = (req, res) => {
@@ -140,15 +148,13 @@ const otpVerify = (req, res) => {
             console.log(user);
             return res.status(200).json({ token, user });
           }
-        }).catch((error)=>{
-          res.status(400).json({errorMessage:'Invalid OTP'})
         })
-    } 
-    
+        .catch((error) => {
+          res.status(400).json({ errorMessage: "Invalid OTP" });
+        });
+    }
   });
 };
-
-
 
 //Admin Login API
 

@@ -1,61 +1,58 @@
-const { Schema } = require('mongoose')
-const mongoose = require('mongoose');
+const { Schema } = require("mongoose");
+const mongoose = require("mongoose");
 
-const ProductSchema=new Schema({
-    name:{
-        type:String,
-        required:true,
-        trim:true,
+const ProductSchema = new Schema(
+  {
+    name: {
+      type: String,
+      required: true,
+      trim: true,
     },
-    slug:{
-        type:String,
-        required:true,
-        unique:true
+    slug: {
+      type: String,
+      required: true,
+      unique: true,
     },
-   price:{
-       type:Number,
-       required:true
-   },
-   description:{
-       type:String,
-       required:true,
-       trim:true
-   },
-   discount:{
-       type:Number
-   },
-   quantity:{
-       type:Number,
-       required:true
-   },
-   img1:{
-    type:Array
-
-   
-   },
-   img2:{
-   
-        type:Array,
-  
-  },img3:{
-     type:Array
-  
-  },img4:{
-    
-    type:Array
+    price: {
+      type: Number,
+      required: true,
+    },
+    description: {
+      type: String,
+      required: true,
+      trim: true,
+    },
+    discount: {
+      type: Number,
+    },
+    quantity: {
+      type: Number,
+      required: true,
+    },
+    img1: {
+      type: Array,
+    },
+    img2: {
+      type: Array,
+    },
+    img3: {
+      type: Array,
+    },
+    img4: {
+      type: Array,
+    },
+    size: {
+      type: Array,
+    },
+    mainCategory: {
+      type: String,
+    },
+    subCategory: {
+      type: String,
+    },
+    updatedAt: Date,
   },
-   size:{
-    type:Array
-   },
-   mainCategory:{
-       type:String,
-      
-   },
-   subCategory:{
-    type:String,
-   
-},
-   updatedAt:Date,
-},{timestamps:true});
+  { timestamps: true }
+);
 
-module.exports = mongoose.model('Product',ProductSchema)
+module.exports = mongoose.model("Product", ProductSchema);

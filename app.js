@@ -10,7 +10,7 @@ const authRouter = require ('./routes/auth');
 const usersRouter = require('./routes/users');
  const productRouter =require ('./routes/product')
 const categoryRouter = require('./routes/category');
-//for image requiring
+const cartRouter = require('./routes/cart');
 
 
 const app = express();
@@ -31,7 +31,7 @@ app.use('/api/auth',authRouter);
 app.use('/api/users', usersRouter);
 app.use('/api/category', categoryRouter);
 app.use('/api/product', productRouter)
-
+app.use('/api/cart',cartRouter);
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
   next(createError(404));

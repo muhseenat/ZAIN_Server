@@ -96,6 +96,7 @@ const deleteProduct = async (req, res) => {
 };
 //UPDATE PRODUCT API
 const updateProduct = async (req, res) => {
+  console.log('request ethiiiiii');
   try {
     const url = [];
 
@@ -115,9 +116,9 @@ const updateProduct = async (req, res) => {
     }
 
     const data = JSON.parse(req.body.data);
- 
+  
 
-   let update_product= Product.updateOne(
+    Product.updateOne(
       { _id: req.params.id },
       {
         $set: {
@@ -127,7 +128,7 @@ const updateProduct = async (req, res) => {
           description: data.description ,
           discount: data.discount ,
           quantity: data.quantity ,
-          size: data.size,
+          size: push(data.size), //check it work or not
           mainCategory: data.selectedCategory ,
           subCategory: data.selectedSubCategory,
           img1: url[0] ,
@@ -136,14 +137,13 @@ const updateProduct = async (req, res) => {
           img4: url[3] ,
         },
       }
-    )
-  
-   res.status(201).json({ update_product});
-     
-    
-    
-  } catch (err) {
-    return res.status(400).json({ err });
+    ).then((resp)=>{
+      res.status(200).json({resp})
+    })
+   
+ } catch (err) {
+
+ res.status(400).json( err );
   }
 };
 

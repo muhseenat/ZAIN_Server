@@ -12,11 +12,15 @@ const OrderSchema = new mongoose.Schema(
           type: Number,
           default: 1,
         },
+        price: {
+          type: Number,
+        },
       },
     ],
     amount: { type: Number, required: true },
     address: { type: Object, required: true },
     status: { type: String, default: "pending" },
+    method: { type: String },
   },
   { timestamps: true }
 );
