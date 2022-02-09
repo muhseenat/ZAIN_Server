@@ -13,37 +13,39 @@ const registerUser = async (req, res) => {
 
   const { name, email, phone, password, passwordVerify } = req.body;
   if (password.length < 6) {
-    return res.status(400).json({ errorMessage: "Enter minimum 6 characters" });
+     res.status(400).json({ errorMessage: "Enter minimum 6 characters" });
   }
-  if (phone.length > 10 || phone.length < 10) {
-    return res.status(400).json({ errorMessage: "Enter correct phone number" });
+ 
+  else if (password !== passwordVerify) {
+     res.status(400).json({ errorMessage: "Enter the same password" });
   }
-  if (password !== passwordVerify) {
-    return res.status(400).json({ errorMessage: "Enter the same password" });
+  else{
+    User.findOne({ email }).exec((error, user) => {
+      if (user)
+        return res
+          .status(400)
+          .json({ errorMessage: "This Email is already taken" });
+    });
+   
+    const newUser = new User({ name, email, phone, password });
+    console.log(newUser);
+    await newUser.save((error, user) => {
+      if (error) {
+        res.status(400).json({ errorMessage: "Something went wrong" });
+      }
+      else {
+        const token = jwt.sign({ user: user._id }, process.env.JWT_SECRET_KEY, {
+          expiresIn: "2d",
+        });
+        console.log(token + "token ithannnnnn" +user);
+       res.status(200).json({ token, user });
+      }
+    });
+    
   }
  
 
-  User.findOne({ email }).exec((error, user) => {
-    if (user)
-      return res
-        .status(400)
-        .json({ errorMessage: "This Email is already taken" });
-  });
- 
-  const newUser = new User({ name, email, phone, password });
-  console.log(newUser);
-  await newUser.save((error, user) => {
-    if (error) {
-      return res.status(400).json({ errorMessage: "Something went wrong" });
-    }
-    if (user) {
-      const token = jwt.sign({ user: data._id }, process.env.JWT_SECRET_KEY, {
-        expiresIn: "2d",
-      });
-      console.log(token + "token ithannnnnn" +user);
-      return res.status(200).json({ token, user });
-    }
-  });
+  
 };
 
 //User Login API
@@ -101,7 +103,7 @@ const otpSend = (req, res) => {
       client.verify
         .services(serviceSID)
         .verifications.create({
-          to: `+91${phone}`,
+          to: `+${phone}`,
           channel: "sms",
         })
         .then((resp) => {
