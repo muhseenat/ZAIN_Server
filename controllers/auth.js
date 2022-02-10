@@ -8,8 +8,7 @@ const client = require("twilio")(accountSID, authToken);
 
 //User Register API
 const registerUser = async (req, res) => {
-  console.log("wowww");
-  console.log(req.body);
+
 
   const { name, email, phone, password, passwordVerify } = req.body;
   if (password.length < 6) {
@@ -37,7 +36,7 @@ const registerUser = async (req, res) => {
         const token = jwt.sign({ user: user._id }, process.env.JWT_SECRET_KEY, {
           expiresIn: "2d",
         });
-        console.log(token + "token ithannnnnn" +user);
+      
        res.status(200).json({ token, user });
       }
     });
@@ -94,12 +93,12 @@ const loginUser = async (req, res) => {
 //OTP Send API
 const otpSend = (req, res) => {
   const phone = req.body.number;
-  console.log(phone);
-  console.log("ithann phone number" + req.body.number);
+
+ 
   User.findOne({ phone }).exec((error, user) => {
     if (error) return res.status(400).json({ error });
     if (user) {
-      console.log("otp verify step");
+
       client.verify
         .services(serviceSID)
         .verifications.create({
@@ -107,7 +106,7 @@ const otpSend = (req, res) => {
           channel: "sms",
         })
         .then((resp) => {
-          console.log(resp + "otp povunnunddddd");
+        
          res.status(200).json({ resp });
         });
     } else {
@@ -120,15 +119,13 @@ const otpSend = (req, res) => {
 
 // OTP Verify API
 const otpVerify = (req, res) => {
-  console.log(req.body);
+
   const { otp } = req.body;
   const phone = req.body.number;
-  console.log(otp, phone);
-  console.log("endhaaa pattiye");
-  console.log(phone);
+  
 
   User.findOne({ phone }).exec((error, user) => {
-    console.log("usere thappi");
+   
     if (error) return res.status(400).json({ error });
     console.log("thappi kayinj");
     if (user) {
