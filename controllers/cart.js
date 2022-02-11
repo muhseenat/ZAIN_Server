@@ -80,7 +80,11 @@ const getCartItems = (req, res) => {
   ])
     .then((resp) => {
     
-      res.status(200).json({ resp });
+      let summary = resp.reduce((total, product) => {
+        return total + product?.product?.price * product?.quantity;
+      }, 0);
+      
+      res.status(200).json({ resp,summary });
     })
     .catch((error) => {
       res.status(400).json({ error });
@@ -121,5 +125,17 @@ const getCartCount=async(req,res)=>{
    
    
 }
+ const deleteCartproduct=(req,res)=>{
+  const {proId,cartId} = req.body
+  Cart.updateOne({_id:cartId},{
+    $pull:{products:{item:objectId(proId)}}
+  }).then((resp)=>{
+    console.log(resp);
+    res.status(200).json({response:"Product deleted"})
+  }).catch((err)=>{
+    res.status(400).json({err})
+  })
+ }
 
-module.exports = { addToCart, getCartItems, changeQuantity,getCartCount };
+
+module.exports = { addToCart, getCartItems, changeQuantity,getCartCount,deleteCartproduct };
