@@ -80,11 +80,11 @@ const getCartItems = (req, res) => {
   ])
     .then((resp) => {
     
-      let summary = resp.reduce((total, product) => {
+      let total = resp.reduce((total, product) => {
         return total + product?.product?.price * product?.quantity;
       }, 0);
       
-      res.status(200).json({ resp,summary });
+      res.status(200).json({ resp,total });
     })
     .catch((error) => {
       res.status(400).json({ error });
