@@ -145,6 +145,7 @@ const otpVerify = (req, res) => {
             );
             console.log(token + "login time token");
             console.log(user);
+            let user=user.name;
             return res.status(200).json({ token, user });
           }
         })

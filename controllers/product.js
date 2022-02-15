@@ -86,7 +86,7 @@ const deleteProduct = async (req, res) => {
     await cloudinary.uploader.destroy(product.img1[0].id);
     await cloudinary.uploader.destroy(product.img2[0].id);
     await cloudinary.uploader.destroy(product.img3[0].id);
-    await cloudinary.uploader.destroy(product.img4[0].id);
+   await cloudinary.uploader.destroy(product.img4[0].id);
     await product.remove();
     res.status(200).json({ product });
   } catch (error) {
