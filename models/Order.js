@@ -7,6 +7,7 @@ const OrderSchema = new mongoose.Schema(
 
     address: { type: Object, required: true },
     method: { type: String },
+    date:{type:Date}
   },
   { timestamps: true }
 );
