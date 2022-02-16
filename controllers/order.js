@@ -89,7 +89,7 @@ const addAddress = async (req, res) => {
                 const options = {
                   amount: amount * 100,
                   currency: "INR",
-                  receipt: "" + orderId, //shortid.generate(),//""+resp._id
+                  receipt: "" + orderId, 
                   payment_capture: 1,
                 };
                 console.log(options);
@@ -189,7 +189,7 @@ const getAddress = (req, res) => {
     });
 };
 
-const getOrder = (req, res) => {
+const getOrders = (req, res) => {
   Order.aggregate([
     {
       $unwind: "$products",
@@ -223,10 +223,29 @@ const changeStatus = async (req, res) => {
     });
 };
 
+
+ const orderHistory=async(req,res)=>{
+ const id= req.params.id
+ console.log(id);
+ await Order.aggregate([
+  {
+    $match:{userId:id}
+  },{
+    $unwind:"$products"
+  },
+]).then((order)=>{
+  console.log(order);
+  res.status(200).json({order})
+}).catch((err)=>{
+  res.staus(400).json({err})
+})
+ }
+
 module.exports = {
   addAddress,
   getAddress,
-  getOrder,
+  getOrders,
+  orderHistory,
   changeStatus,
   verifyPayment,
 };
