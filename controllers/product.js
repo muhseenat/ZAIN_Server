@@ -72,7 +72,7 @@ const getProduct = async (req, res) => {
     } else if (qCategory) {
       products = await Product.find({ mainCategory: qCategory });
     } else {
-      products = await Product.find();
+      products = await Product.find().sort({_id:-1});
     }
     res.status(200).json(products);
   } catch (error) {

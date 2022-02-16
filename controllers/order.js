@@ -163,7 +163,7 @@ const verifyPayment = (req, res) => {
     res.status(401);
   }
 };
-
+//GET ADDRESS API 
 const getAddress = (req, res) => {
   const userId = req.params.id;
   console.log(userId);
@@ -188,7 +188,7 @@ const getAddress = (req, res) => {
       res.status(400).json({ err });
     });
 };
-
+//GET ORDER API
 const getOrders = (req, res) => {
   Order.aggregate([
     {

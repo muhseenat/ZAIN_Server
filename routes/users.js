@@ -3,6 +3,7 @@ var router = express.Router();
 const userControllers = require('../controllers/user')
 
 
+
 router.get('/getusers',userControllers.getUser)
 router.put('/edituser/:id',userControllers.updateUser)
 router.get('/searchusers/:search',userControllers.searchUser)

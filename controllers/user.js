@@ -82,6 +82,20 @@ User.updateOne({_id:req.params.id},{$set:{
     })
 }
 
+// //ADD PROFILE PIC API
+//  const addProfile = async(req,res)=>{
+//      console.log(req.file);
+//      console.log(req);
+
+//    try {
+     
+//    } catch (error) {
+     
+//    }
+
+//  }
+
+
 module.exports = {
   getUser,
   searchUser,
@@ -89,6 +103,7 @@ module.exports = {
   deleteUser,
   updateUser,
   blockUser,
+  
 };
 
 
