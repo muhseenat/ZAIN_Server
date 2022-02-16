@@ -1,4 +1,8 @@
+const { isValidObjectId } = require("mongoose");
 const User = require("../models/User");
+const mongoose = require("mongoose");
+
+const objectId = mongoose.Types.ObjectId;
 
 const getUser = (req, res) => {
   User.find({})
@@ -95,7 +99,49 @@ User.updateOne({_id:req.params.id},{$set:{
 
 //  }
 
+//ADDRESS UPDATE API
 
+const updateAddress=(req,res)=>{
+  console.log(req.body);
+  const {userId,currentAddresses} = req.body
+
+  User.updateOne.aggregate([
+    {
+      $match:{
+        _id: objectId(userId)
+      },
+       $umwind:"$address"
+      },
+      {
+        $match:{
+          _id:objectId(currentAddresses._id)
+        }
+      }
+    
+  ]).then((resp)=>{
+    log(resp)
+  }).catch((err)=>{
+    console.log(err);
+  })
+}
+//ADD ADDRESS API
+const addAddress =(req,res)=>{
+  console.log(req.body);
+  const {userId,currentAddresses} = req.body
+  User.updateOne(
+    { _id: userId },
+    {
+      $push: {
+        address: currentAddresses,
+      },
+    }
+  ).then((resp)=>{
+    console.log(resp);
+  }).catch((err)=>{
+   console.log(err)
+  }
+  )
+}
 module.exports = {
   getUser,
   searchUser,
@@ -103,7 +149,8 @@ module.exports = {
   deleteUser,
   updateUser,
   blockUser,
-  
+  updateAddress,
+  addAddress
 };
 
 
