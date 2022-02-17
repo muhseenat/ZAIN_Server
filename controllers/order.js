@@ -7,7 +7,7 @@ const Razorpay = require("razorpay");
 const shortid = require("shortid");
 const objectId = mongoose.Types.ObjectId;
 const crypto = require("crypto");
-const { log } = require("console");
+// const { log } = require("console");
 const razorpay = new Razorpay({
   key_id: process.env.RAZORPAY,
   key_secret: process.env.RAZORPAY_SECRET_KEY,
@@ -243,19 +243,19 @@ const changeStatus = async (req, res) => {
  }
  //APPLY COUPON API
  const applyCoupon= async(req,res)=>{
-   const {userId,coupon} = req.body
+   const {userId,couponCode} = req.body
    console.log(req.body);
-   let checkCoupon=  await Coupon.findOne({code:coupon})
+   let checkCoupon=  await Coupon.findOne({code:couponCode})
    console.log(checkCoupon);
-   const discount=checkCoupon.discount
+   
    if(checkCoupon){
      let userExist= checkCoupon.userId.findIndex( users => users==userId)
      console.log(userExist);
      if(userExist==-1){
-       Coupon.updateOne({code:coupon},{
+       Coupon.updateOne({code:couponCode},{
         $push:{userId:userId} 
        }).then((resp)=>{
-         res.status(200).json({discount})
+         res.status(200).json({checkCoupon})
        }).catch((err)=>{
          console.log(err);
          res.status(400)

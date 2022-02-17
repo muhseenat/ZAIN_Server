@@ -1,5 +1,5 @@
 const Product = require("../models/Product");
-const Coupon = require('../models/Coupon')
+const Coupon = require("../models/Coupon");
 const slugify = require("slugify");
 const cloudinary = require("../config/cloudinary");
 
@@ -73,7 +73,7 @@ const getProduct = async (req, res) => {
     } else if (qCategory) {
       products = await Product.find({ mainCategory: qCategory });
     } else {
-      products = await Product.find().sort({_id:-1});
+      products = await Product.find().sort({ _id: -1 });
     }
     res.status(200).json(products);
   } catch (error) {
@@ -97,7 +97,7 @@ const deleteProduct = async (req, res) => {
 };
 //UPDATE PRODUCT API
 const updateProduct = async (req, res) => {
-  console.log('request ethiiiiii');
+
   try {
     const url = [];
 
@@ -117,63 +117,75 @@ const updateProduct = async (req, res) => {
     }
 
     const data = JSON.parse(req.body.data);
-  
 
     Product.updateOne(
       { _id: req.params.id },
       {
         $set: {
           name: data.productName,
-          slug: slugify(data.productName) ,
-          price: data.price ,
-          description: data.description ,
-          discount: data.discount ,
-          quantity: data.quantity ,
+          slug: slugify(data.productName),
+          price: data.price,
+          description: data.description,
+          discount: data.discount,
+          quantity: data.quantity,
           size: push(data.size), //check it work or not
-          mainCategory: data.selectedCategory ,
+          mainCategory: data.selectedCategory,
           subCategory: data.selectedSubCategory,
-          img1: url[0] ,
-          img2: url[1] ,
-          img3: url[2] ,
-          img4: url[3] ,
+          img1: url[0],
+          img2: url[1],
+          img3: url[2],
+          img4: url[3],
         },
       }
-    ).then((resp)=>{
-      res.status(200).json({resp})
-    })
-   
- } catch (err) {
-
- res.status(400).json( err );
+    ).then((resp) => {
+      res.status(200).json({ resp });
+    });
+  } catch (err) {
+    res.status(400).json(err);
   }
 };
 
 //CREATE COUPON OFFER
-const createCoupon= async(req,res)=>{
- const {name,discount,maxamount,minamount,couponcode,expdate,minPurchase}=req.body
-console.log(req.body);
+const createCoupon = async (req, res) => {
+  const {
+    name,
+    discount,
+    maxamount,
+    minamount,
+    couponcode,
+    expdate,
+    minPurchase,
+  } = req.body;
+  console.log(req.body);
+  let couponExist = await Coupon.findOne({ code: couponcode });
+  console.log(couponExist);
+  if (couponExist) {
+    res.status(400).json({ errorMessage: "Coupon already exist" });
+  } else {
+    const coupon = new Coupon({
+      name: name,
+      userId: [],
+      discount: discount,
+      maxAmount: maxamount,
+      minAmount: minamount,
+      minPurchase: minPurchase,
+      code: couponcode,
+      expire: new Date(expdate),
+      expireAt: new Date(expdate),
+    });
 
-const coupon=new Coupon({
-  name:name,
-  userId:[],
-    discount: discount,
-    maxAmount: maxamount,
-    minAmount: minamount,
-    minPurchase: minPurchase,
-    code: couponcode,
-    expire: new Date(expdate),
-    expireAt:new Date(expdate)
-})
-
-coupon.save()
-.then((resp)=>{
-  console.log(resp);
-}).catch((err)=>{
-  console.log(err);
-})
-
-}
-
+    coupon
+      .save()
+      .then((resp) => {
+        console.log(resp);
+        res.status(200).json({resp})
+      })
+      .catch((err) => {
+        console.log(err);
+        res.status(200).json({err})
+      });
+  }
+};
 
 module.exports = {
   addProduct,
@@ -181,5 +193,5 @@ module.exports = {
   deleteProduct,
   updateProduct,
   getProductById,
-  createCoupon
+  createCoupon,
 };
