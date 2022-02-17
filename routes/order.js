@@ -9,4 +9,5 @@ router.get('/getorders',orderControllers.getOrders);
 router.put('/changestatus',orderControllers.changeStatus);
 router.post('/verifypayment',orderControllers.verifyPayment);
 router.get('/order-history/:id',orderControllers.orderHistory);
+router.post('/apply-coupon',orderControllers.applyCoupon)
 module.exports=router

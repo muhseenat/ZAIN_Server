@@ -11,8 +11,9 @@ const upload = require ("../config/multer");
 router.post('/addProduct',upload.array('img'),productControllers.addProduct);
 router.get('/getproduct',productControllers.getProduct);
 router.delete('/deleteproduct/:id',productControllers.deleteProduct);
-router.put('/updateproduct/:id',upload.array('img'),productControllers.updateProduct);
+// router.put('/updateproduct/:id',upload.array('img'),productControllers.updateProduct);
 router.get('/getproductbyid/:id',productControllers.getProductById);
+router.post('/offer/coupon',productControllers.createCoupon);
 
 
 

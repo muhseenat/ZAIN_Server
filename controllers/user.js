@@ -3,10 +3,11 @@ const User = require("../models/User");
 const mongoose = require("mongoose");
 
 const objectId = mongoose.Types.ObjectId;
-
+//GET USERS API
 const getUser = (req, res) => {
   User.find({})
     .then((users) => {
+      console.log(users);
       res.status(200).json({ users });
     })
     .catch((err) => {
@@ -14,6 +15,7 @@ const getUser = (req, res) => {
     });
 };
 
+//GET SPECIFIC USER API
 const getSpecificUser = (req, res) => {
   User.findOne({ _id: req.params.id })
     .then((resp) => {
@@ -24,6 +26,8 @@ const getSpecificUser = (req, res) => {
     });
 };
 
+
+//DELETE USER API
 const deleteUser = (req, res) => {
   User.deleteOne({ _id: req.params.id })
     .then((resp) => {
@@ -34,6 +38,7 @@ const deleteUser = (req, res) => {
     });
 };
 
+//UPDATE USER API 
 const updateUser = (req, res) => {
   User.updateOne(
     { _id: req.params.id },
@@ -72,7 +77,7 @@ const searchUser = (req, res) => {
     });
 };
 
-
+// BLOCK USER API
 const blockUser=async(req,res)=>{
 console.log(req.params.id);
 let user = await User.findOne({_id:req.params.id})

@@ -1,4 +1,5 @@
 const Product = require("../models/Product");
+const Coupon = require('../models/Coupon')
 const slugify = require("slugify");
 const cloudinary = require("../config/cloudinary");
 
@@ -132,7 +133,7 @@ const updateProduct = async (req, res) => {
           mainCategory: data.selectedCategory ,
           subCategory: data.selectedSubCategory,
           img1: url[0] ,
-          img2: url[1],
+          img2: url[1] ,
           img3: url[2] ,
           img4: url[3] ,
         },
@@ -147,10 +148,38 @@ const updateProduct = async (req, res) => {
   }
 };
 
+//CREATE COUPON OFFER
+const createCoupon= async(req,res)=>{
+ const {name,discount,maxamount,minamount,couponcode,expdate,minPurchase}=req.body
+console.log(req.body);
+
+const coupon=new Coupon({
+  name:name,
+  userId:[],
+    discount: discount,
+    maxAmount: maxamount,
+    minAmount: minamount,
+    minPurchase: minPurchase,
+    code: couponcode,
+    expire: new Date(expdate),
+    expireAt:new Date(expdate)
+})
+
+coupon.save()
+.then((resp)=>{
+  console.log(resp);
+}).catch((err)=>{
+  console.log(err);
+})
+
+}
+
+
 module.exports = {
   addProduct,
   getProduct,
   deleteProduct,
   updateProduct,
   getProductById,
+  createCoupon
 };

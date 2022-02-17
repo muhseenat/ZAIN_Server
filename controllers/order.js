@@ -1,5 +1,6 @@
 const User = require("../models/User");
 const Order = require("../models/Order");
+const Coupon = require ("../models/Coupon")
 const Cart = require("../models/Cart");
 const mongoose = require("mongoose");
 const Razorpay = require("razorpay");
@@ -11,7 +12,7 @@ const razorpay = new Razorpay({
   key_id: process.env.RAZORPAY,
   key_secret: process.env.RAZORPAY_SECRET_KEY,
 });
-
+// ORDER CREATE API
 const addAddress = async (req, res) => {
   console.log(req.body);
   const { userId, currentAddresses, showSave, method, amount } = req.body;
@@ -126,7 +127,7 @@ const addAddress = async (req, res) => {
       res.status(400).json({ err });
     });
 };
-
+//RAZORPAY VERIFICATION API
 const verifyPayment = (req, res) => {
   console.log(req.body);
   const { response, order } = req.body;
@@ -204,7 +205,7 @@ const getOrders = (req, res) => {
       res.status(400).json({ err });
     });
 };
-
+// STATUS CHANGE API
 const changeStatus = async (req, res) => {
   const { status, orderId, prodId } = req.body;
   console.log(req.body, prodId);
@@ -223,7 +224,7 @@ const changeStatus = async (req, res) => {
     });
 };
 
-
+//GET ORDER HISTORY API
  const orderHistory=async(req,res)=>{
  const id= req.params.id
  console.log(id);
@@ -240,6 +241,34 @@ const changeStatus = async (req, res) => {
   res.staus(400).json({err})
 })
  }
+ //APPLY COUPON API
+ const applyCoupon= async(req,res)=>{
+   const {userId,coupon} = req.body
+   console.log(req.body);
+   let checkCoupon=  await Coupon.findOne({code:coupon})
+   console.log(checkCoupon);
+   const discount=checkCoupon.discount
+   if(checkCoupon){
+     let userExist= checkCoupon.userId.findIndex( users => users==userId)
+     console.log(userExist);
+     if(userExist==-1){
+       Coupon.updateOne({code:coupon},{
+        $push:{userId:userId} 
+       }).then((resp)=>{
+         res.status(200).json({discount})
+       }).catch((err)=>{
+         console.log(err);
+         res.status(400)
+       })
+     }else{
+       res.status(400).json({errorMessage:"Coupon already applied"})
+     }
+   }else{
+     res.status(400).json({errorMessage:"Invalid Coupon"})
+   }
+ }
+
+
 
 module.exports = {
   addAddress,
@@ -248,4 +277,5 @@ module.exports = {
   orderHistory,
   changeStatus,
   verifyPayment,
+  applyCoupon
 };
