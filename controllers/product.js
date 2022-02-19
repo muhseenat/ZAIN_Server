@@ -221,6 +221,25 @@ const productOffer=async(req,res)=>{
     })
 }
 
+//CATEGORY OFFER API
+
+const categoryOffer = async(req,res)=>{
+  const {selectedSubCategory,discount}=req.body
+   console.log(req.body);
+   let product =  await Product.updateMany({$and:[{subCategory:selectedSubCategory},{discount:{$eq:null}}]},
+    {
+      
+        $set:{
+          discount:discount
+        }
+      
+    })
+   console.log(product);
+   console.log('interval..............');
+  
+ 
+}
+
 module.exports = {
   addProduct,
   getProduct,
@@ -229,5 +248,6 @@ module.exports = {
   getProductById,
   createCoupon,
   getProductsName,
-  productOffer
+  productOffer,
+  categoryOffer
 };

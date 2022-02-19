@@ -16,6 +16,7 @@ router.get('/getproductbyid/:id',productControllers.getProductById);
 router.post('/offer/coupon',productControllers.createCoupon);
 router.get('/get-products',productControllers.getProductsName)
 router.put('/product-offer',productControllers.productOffer)
+router.put('/category-offer',productControllers.categoryOffer)
 
 
 
