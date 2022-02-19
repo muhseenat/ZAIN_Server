@@ -4,7 +4,7 @@ const mongoose = require("mongoose");
 
 const objectId = mongoose.Types.ObjectId;
 
-
+// ADD TO CART
 const addToCart = async (req, res) => {
   const { userId, proId } = req.body;
   let proObj = { item: objectId(proId), quantity: 1 };
@@ -47,7 +47,7 @@ const addToCart = async (req, res) => {
       });
   }
 };
-
+// GET CART ITEMS
 const getCartItems = (req, res) => {
   const userId = req.params.id;
   Cart.aggregate([
@@ -92,7 +92,7 @@ const getCartItems = (req, res) => {
 };
 
 
-
+// QUANTITY CHANGING API
 const changeQuantity=async (req,res)=>{
    const {cartId,proId,count} = req.body
 
@@ -109,7 +109,7 @@ const changeQuantity=async (req,res)=>{
 
 
 }
-
+//CART COUNT API
 const getCartCount=async(req,res)=>{
   const userId= req.params.id
   let count=0
@@ -121,10 +121,10 @@ const getCartCount=async(req,res)=>{
     res.status(200).json({count})
   } catch (error) {
     res.status(400).json({error})
-  }
-   
-   
+  }  
 }
+
+// CART DELETE API
  const deleteCartproduct=(req,res)=>{
   const {proId,cartId} = req.body
   Cart.updateOne({_id:cartId},{
