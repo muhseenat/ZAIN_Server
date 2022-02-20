@@ -1,6 +1,6 @@
 const User = require("../models/User");
 const Order = require("../models/Order");
-const Coupon = require ("../models/Coupon")
+const Coupon = require("../models/Coupon");
 const Cart = require("../models/Cart");
 const mongoose = require("mongoose");
 const Razorpay = require("razorpay");
@@ -92,7 +92,7 @@ const addAddress = async (req, res) => {
                 const options = {
                   amount: amount * 100,
                   currency: "INR",
-                  receipt: "" + orderId, 
+                  receipt: "" + orderId,
                   payment_capture: 1,
                 };
                 console.log(options);
@@ -166,17 +166,19 @@ const verifyPayment = (req, res) => {
     res.status(401);
   }
 };
-//GET ADDRESS API 
+//GET ADDRESS API
 const getAddress = (req, res) => {
   const userId = req.params.id;
   console.log(userId);
- 
-    User.findOne({_id:objectId(userId)},{address:1}).then((adr)=>{
-      res.status(200).json({ address: adr.address})
-    }).catch((err)=>{
-      console.log(err);
-      res.status(400)
+
+  User.findOne({ _id: objectId(userId) }, { address: 1 })
+    .then((adr) => {
+      res.status(200).json({ address: adr.address });
     })
+    .catch((err) => {
+      console.log(err);
+      res.status(400);
+    });
 };
 //GET ORDER API
 const getOrders = (req, res) => {
@@ -214,89 +216,119 @@ const changeStatus = async (req, res) => {
 };
 
 //GET ORDER HISTORY API
- const orderHistory=async(req,res)=>{
- const id= req.params.id
- console.log(id);
- await Order.aggregate([
-  {
-    $match:{userId:id}
-  },{
-    $unwind:"$products"
-  },
-]).then((order)=>{
-  console.log(order);
-  res.status(200).json({order})
-}).catch((err)=>{
-  res.staus(400).json({err})
-})
- }
- //APPLY COUPON API
- const applyCoupon= async(req,res)=>{
-   const {userId,couponCode} = req.body
-   console.log(req.body);
-   let checkCoupon=  await Coupon.findOne({code:couponCode})
-   console.log(checkCoupon);
-   
-   if(checkCoupon){
-     let userExist= checkCoupon.userId.findIndex( users => users==userId)
-     console.log(userExist);
-     if(userExist==-1){
-       Coupon.updateOne({code:couponCode},{
-        $push:{userId:userId} 
-       }).then((resp)=>{
-         res.status(200).json({checkCoupon})
-       }).catch((err)=>{
-         console.log(err);
-         res.status(400)
-       })
-     }else{
-       res.status(400).json({errorMessage:"Coupon already applied"})
-     }
-    res.status(200).json({checkCoupon})
-
-   }else{
-     res.status(400).json({errorMessage:"Invalid Coupon"})
-   }
- }
-
-
- const salesReport=(req,res)=>{
-   Order.aggregate([
-    
-    {$unwind:"$products"},
+const orderHistory = async (req, res) => {
+  const id = req.params.id;
+  console.log(id);
+  await Order.aggregate([
     {
-      $match:{"products.status":"delivered"},
-   },
- 
-    
-    
-    ]).then((report)=>{
-      console.log(report);
-      res.status(200).json({report})
-    }).catch((err)=>{
-       res.status(400).json({err})
+      $match: { userId: id },
+    },
+    {
+      $unwind: "$products",
+    },
+  ])
+    .then((order) => {
+      console.log(order);
+      res.status(200).json({ order });
     })
- }
+    .catch((err) => {
+      res.staus(400).json({ err });
+    });
+};
+
+//GET LATEST ORDERS API
+const latestOrders =(req,res)=>{
+  Order.aggregate([
+    {
+      $unwind: "$products",
+    },
+  ]).sort({ createdAt: -1 }).limit(5)
+    .then((orders) => {
+      console.log(orders);
+      res.status(200).json({ orders});
+    })
+    .catch((err) => {
+      console.log(err);
+      res.status(400).json({ err });
+    });
+
+}
 
 
- const filteredReport=(req,res)=>{
-   const {fromDate,toDate} =req.body
 
- Order.aggregate([
-    
-  {$unwind:"$products"},
-  {$match:{"products.status":"delivered",date:{$gte:new Date(fromDate),$lte:new Date(toDate)}}}
+//APPLY COUPON API
+const applyCoupon = async (req, res) => {
+  const { userId, couponCode } = req.body;
+  console.log(req.body);
+  let checkCoupon = await Coupon.findOne({ code: couponCode });
+  console.log(checkCoupon);
+
+  if (checkCoupon) {
+    let userExist = checkCoupon.userId.findIndex((users) => users == userId);
+    console.log(userExist);
+    if (userExist == -1) {
+      Coupon.updateOne(
+        { code: couponCode },
+        {
+          $push: { userId: userId },
+        }
+      )
+        .then((resp) => {
+          res.status(200).json({ checkCoupon });
+        })
+        .catch((err) => {
+          console.log(err);
+          res.status(400);
+        });
+    } else {
+      res.status(400).json({ errorMessage: "Coupon already applied" });
+    }
+    res.status(200).json({ checkCoupon });
+  } else {
+    res.status(400).json({ errorMessage: "Invalid Coupon" });
+  }
+};
+//SALES REPORT API
+const salesReport = (req, res) => {
+  Order.aggregate([
+    { $unwind: "$products" },
+   
+
+    {
+      $match: { "products.status": "delivered" },
+    },
+   
   
-  
-  ]).then((report)=>{
-    res.status(200).json({report})
-  }).catch((err)=>{
-    res.status(400).json({err})
-  })
- }
+  ])
+    .then((report) => {
+      console.log(report);
+      res.status(200).json({ report });
+    })
+    .catch((err) => {
+      console.log(err);
+      res.status(400).json({ err });
+    });
+};
+//FILTERED SALES REPORT API
+const filteredReport = (req, res) => {
+  const { fromDate, toDate } = req.body;
 
-
-
+  Order.aggregate([
+    { $unwind: "$products" },
+    {
+      $match: {
+        "products.status": "delivered",
+        date: { $gte: new Date(fromDate), $lte: new Date(toDate) },
+      },
+    },
+  ])
+    .then((report) => {
+      res.status(200).json({ report });
+    })
+    .catch((err) => {
+      res.status(400).json({ err });
+    });
+};
 
 module.exports = {
   addAddress,
@@ -307,5 +339,6 @@ module.exports = {
   verifyPayment,
   applyCoupon,
   salesReport,
-  filteredReport
+  filteredReport,
+  latestOrders
 };
