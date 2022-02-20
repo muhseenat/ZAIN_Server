@@ -11,4 +11,5 @@ router.post('/verifypayment',orderControllers.verifyPayment);
 router.get('/order-history/:id',orderControllers.orderHistory);
 router.post('/apply-coupon',orderControllers.applyCoupon)
 router.get('/get-sales-report',orderControllers.salesReport)
+router.get('/get-filtered-report',orderControllers.filteredReport)
 module.exports=router
