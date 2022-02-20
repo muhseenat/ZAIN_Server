@@ -150,7 +150,6 @@ const createCoupon = async (req, res) => {
     name,
     discount,
     maxamount,
-    minamount,
     couponcode,
     expdate,
     minPurchase,
@@ -166,7 +165,7 @@ const createCoupon = async (req, res) => {
       userId: [],
       discount: discount,
       maxAmount: maxamount,
-      minAmount: minamount,
+  
       minPurchase: minPurchase,
       code: couponcode,
       expire: new Date(expdate),
@@ -212,7 +211,7 @@ const productOffer = async (req, res) => {
   let product = await Product.findById(selectedProduct);
   console.log(product);
   product
-    .updateOne({ discount: discount })
+    .updateOne({ discount: discount },{offer:true})
     .then((resp) => {
       console.log(resp);
       res.status(200);
@@ -230,7 +229,7 @@ const categoryOffer = (req, res) => {
   console.log(req.body);
   Product.updateMany(
     {
-      $and: [{ subCategory: selectedSubCategory }, { discount: { $eq: null } }],
+      $and: [{ subCategory: selectedSubCategory }, { offer:false }],
     },
     {
       $set: {

@@ -168,26 +168,13 @@ const verifyPayment = (req, res) => {
 const getAddress = (req, res) => {
   const userId = req.params.id;
   console.log(userId);
-  User.aggregate([
-    {
-      $match: {
-        _id: objectId(userId),
-      },
-    },
-    {
-      $project: {
-        _id: 0,
-        address: 1,
-      },
-    },
-  ])
-    .then((adr) => {
-      console.log(adr);
-      res.status(200).json({ adr });
+ 
+    User.findOne({_id:objectId(userId)},{address:1}).then((adr)=>{
+      res.status(200).json({ address: adr.address})
+    }).catch((err)=>{
+      console.log(err);
+      res.status(400)
     })
-    .catch((err) => {
-      res.status(400).json({ err });
-    });
 };
 //GET ORDER API
 const getOrders = (req, res) => {
@@ -251,18 +238,18 @@ const changeStatus = async (req, res) => {
    if(checkCoupon){
      let userExist= checkCoupon.userId.findIndex( users => users==userId)
      console.log(userExist);
-    //  if(userExist==-1){
-    //    Coupon.updateOne({code:couponCode},{
-    //     $push:{userId:userId} 
-    //    }).then((resp)=>{
-    //      res.status(200).json({checkCoupon})
-    //    }).catch((err)=>{
-    //      console.log(err);
-    //      res.status(400)
-    //    })
-    //  }else{
-    //    res.status(400).json({errorMessage:"Coupon already applied"})
-    //  }
+     if(userExist==-1){
+       Coupon.updateOne({code:couponCode},{
+        $push:{userId:userId} 
+       }).then((resp)=>{
+         res.status(200).json({checkCoupon})
+       }).catch((err)=>{
+         console.log(err);
+         res.status(400)
+       })
+     }else{
+       res.status(400).json({errorMessage:"Coupon already applied"})
+     }
     res.status(200).json({checkCoupon})
 
    }else{
@@ -270,6 +257,25 @@ const changeStatus = async (req, res) => {
    }
  }
 
+
+ const salesReport=()=>{
+  Order.aggregate([
+    
+    {$unwind:"$products"},
+    {$match:{"product.status":"delivered"}}
+    
+    
+    ])
+ }
+
+
+ Order.aggregate([
+    
+  {$unwind:"$products"},
+  {$match:{"product.status":"delivered",date:{$gte:new Date("10/02/2022"),$lte:new Date("15/02/22")}}}
+  
+  
+  ])
 
 
 module.exports = {
@@ -279,5 +285,6 @@ module.exports = {
   orderHistory,
   changeStatus,
   verifyPayment,
-  applyCoupon
+  applyCoupon,
+  salesReport
 };
