@@ -10,5 +10,6 @@ router.get('/searchusers/:search',userControllers.searchUser)
 router.delete('/deleteusers/:id',userControllers.deleteUser)
 router.get('/getuser/:id',userControllers.getSpecificUser)
 router.put('/block/:id',userControllers.blockUser);
-
+router.put('/update-address',userControllers.updateAddress)
+router.put('/add-address',userControllers.addAddress)
 module.exports = router;

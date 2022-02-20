@@ -97,7 +97,6 @@ const deleteProduct = async (req, res) => {
 };
 //UPDATE PRODUCT API
 const updateProduct = async (req, res) => {
-
   try {
     const url = [];
 
@@ -178,67 +177,74 @@ const createCoupon = async (req, res) => {
       .save()
       .then((resp) => {
         console.log(resp);
-        res.status(200).json({resp})
+        res.status(200).json({ resp });
       })
       .catch((err) => {
         console.log(err);
-        res.status(200).json({err})
+        res.status(200).json({ err });
       });
   }
 };
 // GET ALL PRODUCTS NAME API
 
- const getProductsName=(req,res)=>{
-   Product.aggregate([
-     {
-      $project:{
-        name:1
-      }
-     }
-   
-   ]).then((products)=>{
+const getProductsName = (req, res) => {
+  Product.aggregate([
+    {
+      $project: {
+        name: 1,
+      },
+    },
+  ])
+    .then((products) => {
       console.log(products);
-      res.status(200).json({products})
-   }).catch((err)=>{
-     console.log(err);
-     res.status(400).json({err})
-   })
- }
-
+      res.status(200).json({ products });
+    })
+    .catch((err) => {
+      console.log(err);
+      res.status(400).json({ err });
+    });
+};
 
 //PRODUCT OFFER API
-const productOffer=async(req,res)=>{
-   console.log(req.body);
-   const {selectedProduct,discount}= req.body
-   let product= await Product.findById(selectedProduct)
-   console.log(product)
-    product.updateOne({discount:discount}).then((resp)=>{
+const productOffer = async (req, res) => {
+  console.log(req.body);
+  const { selectedProduct, discount } = req.body;
+  let product = await Product.findById(selectedProduct);
+  console.log(product);
+  product
+    .updateOne({ discount: discount })
+    .then((resp) => {
       console.log(resp);
-      res.status(200)
-    }).catch((err)=>{
-      console.log(err);
-      res.status(400).json({err})
+      res.status(200);
     })
-}
+    .catch((err) => {
+      console.log(err);
+      res.status(400).json({ err });
+    });
+};
 
 //CATEGORY OFFER API
 
-const categoryOffer = async(req,res)=>{
-  const {selectedSubCategory,discount}=req.body
-   console.log(req.body);
-   let product =  await Product.updateMany({$and:[{subCategory:selectedSubCategory},{discount:{$eq:null}}]},
+const categoryOffer = (req, res) => {
+  const { selectedSubCategory, discount } = req.body;
+  console.log(req.body);
+  Product.updateMany(
     {
-      
-        $set:{
-          discount:discount
-        }
-      
+      $and: [{ subCategory: selectedSubCategory }, { discount: { $eq: null } }],
+    },
+    {
+      $set: {
+        discount: discount,
+      },
+    }
+  )
+    .then((resp) => {
+      res.status(200);
     })
-   console.log(product);
-   console.log('interval..............');
-  
- 
-}
+    .catch((err) => {
+      req.status(400).json(err);
+    });
+};
 
 module.exports = {
   addProduct,
@@ -249,5 +255,5 @@ module.exports = {
   createCoupon,
   getProductsName,
   productOffer,
-  categoryOffer
+  categoryOffer,
 };

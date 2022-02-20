@@ -133,7 +133,7 @@ const otpVerify = (req, res) => {
       client.verify
         .services(serviceSID)
         .verificationChecks.create({
-          to: `+91${phone}`,
+          to: `+${phone}`,
           code: otp,
         })
         .then((resp) => {
