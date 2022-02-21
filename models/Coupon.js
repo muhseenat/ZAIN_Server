@@ -18,7 +18,7 @@ const CouponSchema = new mongoose.Schema(
     },
     minAmount: {
       type: Number,
-      required:true,
+     
     },
     minPurchase: {
       type: Number,
@@ -26,6 +26,7 @@ const CouponSchema = new mongoose.Schema(
     },
     code: {
       type: String,
+      required:true,
     },
     expire: {
       type: Date,

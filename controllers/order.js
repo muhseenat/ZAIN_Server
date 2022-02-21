@@ -4,11 +4,9 @@ const Coupon = require("../models/Coupon");
 const Cart = require("../models/Cart");
 const mongoose = require("mongoose");
 const Razorpay = require("razorpay");
-const shortid = require("shortid");
+
 const objectId = mongoose.Types.ObjectId;
 const crypto = require("crypto");
-const { log } = require("console");
-const { report } = require("process");
 
 const razorpay = new Razorpay({
   key_id: process.env.RAZORPAY,
@@ -58,7 +56,6 @@ const addAddress = async (req, res) => {
     },
   ])
     .then((resp) => {
-      console.log(resp);
       let product = [];
       resp.forEach((resp) => {
         product.push({
@@ -88,7 +85,6 @@ const addAddress = async (req, res) => {
               res.status(200).json({ codSuccess: true });
             } else {
               const razorpayMethod = () => {
-                console.log(resp);
                 const options = {
                   amount: amount * 100,
                   currency: "INR",
@@ -100,7 +96,6 @@ const addAddress = async (req, res) => {
                 razorpay.orders
                   .create(options)
                   .then((response) => {
-                    console.log(response);
                     res.status(200).json({
                       id: response.id,
                       currency: response.currency,
@@ -109,7 +104,7 @@ const addAddress = async (req, res) => {
                     });
                   })
                   .catch((err) => {
-                    console.log(err);
+                    res.status(400).json({ err });
                   });
               };
 
@@ -118,7 +113,7 @@ const addAddress = async (req, res) => {
           });
         })
         .catch((err) => {
-          console.log(err);
+          res.status(400).json({ err });
         })
 
         .catch((err) => {
@@ -131,23 +126,15 @@ const addAddress = async (req, res) => {
 };
 //RAZORPAY VERIFICATION API
 const verifyPayment = (req, res) => {
-  console.log(req.body);
   const { response, order } = req.body;
-  console.log(response);
-  console.log("verify ayittriunddddd");
-  console.log(order);
+
   let hmac = crypto.createHmac("sha256", process.env.RAZORPAY_SECRET_KEY);
-  console.log("endjavvannnn");
 
   hmac.update(response.razorpay_order_id + "|" + response.razorpay_payment_id);
-  console.log("vallathum nadakkoooo");
-  console.log(hmac);
 
   hmac = hmac.digest("hex");
-  console.log(hmac);
-  console.log(response.razorpay_signature);
+
   if (hmac == response.razorpay_signature) {
-    console.log("verify ayittriunddddd");
     Order.updateOne(
       { _id: objectId(order.data.receipt) },
       {
@@ -169,14 +156,12 @@ const verifyPayment = (req, res) => {
 //GET ADDRESS API
 const getAddress = (req, res) => {
   const userId = req.params.id;
-  console.log(userId);
 
   User.findOne({ _id: objectId(userId) }, { address: 1 })
     .then((adr) => {
       res.status(200).json({ address: adr.address });
     })
     .catch((err) => {
-      console.log(err);
       res.status(400);
     });
 };
@@ -188,29 +173,24 @@ const getOrders = (req, res) => {
     },
   ])
     .then((resp) => {
-      console.log(resp);
       res.status(200).json({ resp });
     })
     .catch((err) => {
-      console.log(err);
       res.status(400).json({ err });
     });
 };
 // STATUS CHANGE API
 const changeStatus = async (req, res) => {
   const { status, orderId, prodId } = req.body;
-  console.log(req.body, prodId);
 
   await Order.updateOne(
     { _id: objectId(orderId), "products.id": objectId(prodId) },
     { $set: { "products.$.status": status } }
   )
     .then((resp) => {
-      console.log(resp);
       res.status(200).json({ resp });
     })
     .catch((err) => {
-      console.log(err);
       res.status(400).json({ err });
     });
 };
@@ -218,7 +198,7 @@ const changeStatus = async (req, res) => {
 //GET ORDER HISTORY API
 const orderHistory = async (req, res) => {
   const id = req.params.id;
-  console.log(id);
+
   await Order.aggregate([
     {
       $match: { userId: id },
@@ -228,7 +208,6 @@ const orderHistory = async (req, res) => {
     },
   ])
     .then((order) => {
-      console.log(order);
       res.status(200).json({ order });
     })
     .catch((err) => {
@@ -237,35 +216,31 @@ const orderHistory = async (req, res) => {
 };
 
 //GET LATEST ORDERS API
-const latestOrders =(req,res)=>{
+const latestOrders = (req, res) => {
   Order.aggregate([
     {
       $unwind: "$products",
     },
-  ]).sort({ createdAt: -1 }).limit(5)
+  ])
+    .sort({ createdAt: -1 })
+    .limit(5)
     .then((orders) => {
-      console.log(orders);
-      res.status(200).json({ orders});
+      res.status(200).json({ orders });
     })
     .catch((err) => {
-      console.log(err);
       res.status(400).json({ err });
     });
-
-}
-
-
+};
 
 //APPLY COUPON API
 const applyCoupon = async (req, res) => {
   const { userId, couponCode } = req.body;
-  console.log(req.body);
+
   let checkCoupon = await Coupon.findOne({ code: couponCode });
-  console.log(checkCoupon);
 
   if (checkCoupon) {
     let userExist = checkCoupon.userId.findIndex((users) => users == userId);
-    console.log(userExist);
+
     if (userExist == -1) {
       Coupon.updateOne(
         { code: couponCode },
@@ -292,20 +267,15 @@ const applyCoupon = async (req, res) => {
 const salesReport = (req, res) => {
   Order.aggregate([
     { $unwind: "$products" },
-   
 
     {
       $match: { "products.status": "delivered" },
     },
-   
-  
   ])
     .then((report) => {
-      console.log(report);
       res.status(200).json({ report });
     })
     .catch((err) => {
-      console.log(err);
       res.status(400).json({ err });
     });
 };
@@ -330,24 +300,24 @@ const filteredReport = (req, res) => {
     });
 };
 // GET MONTHLY INCOME
-const monthlyIncome=(req,res)=>{
+const monthlyIncome = (req, res) => {
   const date = new Date();
   const lastMonth = new Date(date.setMonth(date.getMonth() - 1));
   const previousMonth = new Date(new Date().setMonth(lastMonth.getMonth() - 1));
   Order.aggregate([
     {
-      $match:{
-        createdAt:{$gte:previousMonth}
-      }
+      $match: {
+        createdAt: { $gte: previousMonth },
+      },
     },
     {
-       $unwind:"$products"
+      $unwind: "$products",
     },
     {
-      $project:{
-        month:{$month:"$createdAt"},
-        sales:"$products.price"
-      }
+      $project: {
+        month: { $month: "$createdAt" },
+        sales: "$products.price",
+      },
     },
     {
       $group: {
@@ -355,17 +325,26 @@ const monthlyIncome=(req,res)=>{
         total: { $sum: "$sales" },
       },
     },
-  ]).then((income)=>{
-  
-    res.status(200).json({income})
-  }).catch((err)=>{
-    console.log(err);
-    res.status(400).json({err})
-  })
-}
+  ])
+    .then((income) => {
+      res.status(200).json({ income });
+    })
+    .catch((err) => {
+      res.status(400).json({ err });
+    });
+};
 
-
-
+//GET ORDER COUNT
+const totalCount = (req, res) => {
+  Order.find({})
+    .count()
+    .then((count) => {
+      res.status(200).json({ count });
+    })
+    .catch((err) => {
+      res.status(400).json({ err });
+    });
+};
 
 module.exports = {
   addAddress,
@@ -378,5 +357,6 @@ module.exports = {
   salesReport,
   filteredReport,
   latestOrders,
-  monthlyIncome
+  monthlyIncome,
+  totalCount,
 };
