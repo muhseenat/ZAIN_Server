@@ -13,4 +13,5 @@ router.post('/apply-coupon',orderControllers.applyCoupon)
 router.get('/get-sales-report',orderControllers.salesReport)
 router.post('/get-filter-report',orderControllers.filteredReport)
 router.get('/get-latest-orders',orderControllers.latestOrders)
+router.get('/get-income',orderControllers.monthlyIncome)
 module.exports=router

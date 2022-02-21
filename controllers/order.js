@@ -329,6 +329,76 @@ const filteredReport = (req, res) => {
       res.status(400).json({ err });
     });
 };
+// GET MONTHLY INCOME
+const monthlyIncome=(req,res)=>{
+  const date = new Date();
+  const lastMonth = new Date(date.setMonth(date.getMonth() - 1));
+  const previousMonth = new Date(new Date().setMonth(lastMonth.getMonth() - 1));
+  Order.aggregate([
+    {
+      $match:{
+        createdAt:{$gte:previousMonth}
+      }
+    },
+    {
+       $unwind:"$products"
+    },
+    {
+      $project:{
+        month:{$month:"$createdAt"},
+        sales:"$products.price"
+      }
+    },
+    {
+      $group: {
+        _id: "$month",
+        total: { $sum: "$sales" },
+      },
+    },
+  ]).then((income)=>{
+    console.log(income);
+    res.status(200).json({income})
+  }).catch((err)=>{
+    console.log(err);
+    res.status(400).json({err})
+  })
+}
+
+// router.get("/income", verifyTokenAndAdmin, async (req, res) => {
+//   const productId = req.query.pid;
+//   const date = new Date();
+//   const lastMonth = new Date(date.setMonth(date.getMonth() - 1));
+//   const previousMonth = new Date(new Date().setMonth(lastMonth.getMonth() - 1));
+
+//   try {
+//     const income = await Order.aggregate([
+//       {
+//         $match: {
+//           createdAt: { $gte: previousMonth },
+//           ...(productId && {
+//             products: { $elemMatch: { productId } },
+//           }),
+//         },
+//       },
+//       {
+//         $project: {
+//           month: { $month: "$createdAt" },
+//           sales: "$amount",
+//         },
+//       },
+//       {
+//         $group: {
+//           _id: "$month",
+//           total: { $sum: "$sales" },
+//         },
+//       },
+//     ]);
+//     res.status(200).json(income);
+//   } catch (err) {
+//     res.status(500).json(err);
+//   }
+// });
+
 
 module.exports = {
   addAddress,
@@ -340,5 +410,6 @@ module.exports = {
   applyCoupon,
   salesReport,
   filteredReport,
-  latestOrders
+  latestOrders,
+  monthlyIncome
 };

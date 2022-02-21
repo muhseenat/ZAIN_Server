@@ -157,8 +157,10 @@ User.findOne({_id:userId},{address:1}).then((adr)=>{
 //USER STATICS API
 const userStatics=(req,res)=>{
 
+  // const date = new Date();
+  // const lastYear = new Date(date.setFullYear(date.getFullYear()-1))
   const date = new Date();
-  const lastYear = new Date(date.setFullYear(date.getFullYear()-1))
+  const lastYear = new Date(date.setFullYear(date.getFullYear() - 1));
   console.log(date);
   console.log(lastYear);
   User.aggregate([
