@@ -127,7 +127,7 @@ const updateProduct = async (req, res) => {
           description: data.description,
           discount: data.discount,
           quantity: data.quantity,
-          size: push(data.size), //check it work or not
+          size: data.size, 
           mainCategory: data.selectedCategory,
           subCategory: data.selectedSubCategory,
           img1: url[0],
@@ -198,6 +198,21 @@ const getProductsName = (req, res) => {
     });
 };
 
+
+
+
+//GET PRODUCT ID
+const getProductId=(req,res)=>{
+ let name =req.params.id.trim();
+  Product.findOne({$or:[{name:{$regex:name,$options:"i"}}]},{_id:1}).then((id)=>{
+   console.log(id);
+   res.status(200).json({id})
+ }).catch((err)=>{
+   res.status(400).json({err})
+ })
+}
+
+
 //PRODUCT OFFER API
 const productOffer = async (req, res) => {
   const { selectedProduct, discount } = req.body;
@@ -247,4 +262,5 @@ module.exports = {
   getProductsName,
   productOffer,
   categoryOffer,
+  getProductId
 };
