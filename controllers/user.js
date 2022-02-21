@@ -15,6 +15,20 @@ const getUser = (req, res) => {
     });
 };
 
+//GET LATEST USER
+const latestMembers=(req,res)=>{
+  User.find({}).sort({createdAt:-1}).limit(5)
+    .then((users) => {
+      console.log(users);
+      res.status(200).json({ users });
+    })
+    .catch((err) => {
+      res.status(400).json({ err });
+    });
+
+}
+
+
 //GET SPECIFIC USER API
 const getSpecificUser = (req, res) => {
   User.findOne({ _id: req.params.id })
@@ -91,18 +105,7 @@ User.updateOne({_id:req.params.id},{$set:{
     })
 }
 
-// //ADD PROFILE PIC API
-//  const addProfile = async(req,res)=>{
-//      console.log(req.file);
-//      console.log(req);
 
-//    try {
-     
-//    } catch (error) {
-     
-//    }
-
-//  }
 
 //ADDRESS UPDATE API
 
@@ -151,6 +154,42 @@ User.findOne({_id:userId},{address:1}).then((adr)=>{
 
 
 }
+//USER STATICS API
+const userStatics=(req,res)=>{
+
+  const date = new Date();
+  const lastYear = new Date(date.setFullYear(date.getFullYear()-1))
+  console.log(date);
+  console.log(lastYear);
+  User.aggregate([
+    {
+    $match:{
+      createdAt:{
+        $gte:lastYear
+      }
+    }
+    },
+    {
+      $project:{
+        month:{
+          $month:"$createdAt"
+        }
+      }
+    },
+    {
+      $group:{
+        _id:"$month",
+        total:{$sum:1},
+      }
+    }
+  ]).then((details)=>{
+    console.log(details);
+  }).catch((err)=>{
+    console.log(err);
+  })
+}
+
+
 module.exports = {
   getUser,
   searchUser,
@@ -159,10 +198,33 @@ module.exports = {
   updateUser,
   blockUser,
   updateAddress,
-  addAddress
+  addAddress,
+  latestMembers,
+  userStatics
 };
 
+// //user statis
+// router.get("/stats", verifyTokenAndAdmin, async (req, res) => {
+//   const date = new Date();
+//   const lastYear = new Date(date.setFullYear(date.getFullYear() - 1));
 
-// const addADdress =(req,res)=>{
-//   User.updateOne({id:343434},{$set:{address:req.body}})
-// }
+//   try {
+//     const data = await User.aggregate([
+//       { $match: { createdAt: { $gte: lastYear } } },
+//       {
+//         $project: {
+//           month: { $month: "$createdAt" },
+//         },
+//       },
+//       {
+//         $group: {
+//           _id: "$month",
+//           total: { $sum: 1 },
+//         },
+//       },
+//     ]);
+//     res.status(200).json(data)
+//   } catch (err) {
+//     res.status(500).json(err);
+//   }
+// });
