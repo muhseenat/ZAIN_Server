@@ -127,7 +127,7 @@ const updateProduct = async (req, res) => {
           description: data.description,
           discount: data.discount,
           quantity: data.quantity,
-          size: data.size, 
+          size: push(data.size), 
           mainCategory: data.selectedCategory,
           subCategory: data.selectedSubCategory,
           img1: url[0],
