@@ -157,8 +157,7 @@ User.findOne({_id:userId},{address:1}).then((adr)=>{
 //USER STATICS API
 const userStatics=(req,res)=>{
 
-  // const date = new Date();
-  // const lastYear = new Date(date.setFullYear(date.getFullYear()-1))
+
   const date = new Date();
   const lastYear = new Date(date.setFullYear(date.getFullYear() - 1));
   console.log(date);
@@ -185,9 +184,11 @@ const userStatics=(req,res)=>{
       }
     }
   ]).then((details)=>{
-    console.log(details);
+  
+    res.status(200).json({details})
   }).catch((err)=>{
-    console.log(err);
+
+    res.status(400).json({err})
   })
 }
 
