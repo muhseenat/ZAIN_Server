@@ -2,11 +2,9 @@ const mongoose = require("mongoose");
 
 const CategorySchema = new mongoose.Schema(
   {
-    mainCategory:{type:String,required:true},
+    mainCategory: { type: String, required: true },
 
-    subCategory: {type:Array}
-     
-
+    subCategory: { type: Array },
   },
   { timestamps: true }
 );

@@ -6,7 +6,6 @@ const objectId = mongoose.Types.ObjectId;
 const getUser = (req, res) => {
   User.find({})
     .then((users) => {
-      console.log(users);
       res.status(200).json({ users });
     })
     .catch((err) => {
@@ -20,7 +19,6 @@ const latestMembers = (req, res) => {
     .sort({ createdAt: -1 })
     .limit(5)
     .then((users) => {
-      console.log(users);
       res.status(200).json({ users });
     })
     .catch((err) => {
@@ -95,27 +93,23 @@ const blockUser = async (req, res) => {
 //ADDRESS UPDATE API
 
 const updateAddress = async (req, res) => {
-  console.log(req.body);
   const { userId, currentAddresses } = req.body;
 
- await User.updateOne(
-    { _id: objectId(userId) ,
-     "address._id": currentAddresses._id },
+  await User.updateOne(
+    { _id: objectId(userId), "address._id": currentAddresses._id },
     { $set: { "address.$": currentAddresses } }
-  )
+  );
   User.findOne({ _id: userId }, { address: 1 })
-  .then((adr) => {
-    console.log(adr);
-    res.status(200).json({ address: adr.address });
-  })
-  .catch((err) => {
-    res.status(400).json({ err });
-  });
+    .then((adr) => {
+      res.status(200).json({ address: adr.address });
+    })
+    .catch((err) => {
+      res.status(400).json({ err });
+    });
 };
 
 //ADD ADDRESS API
 const addAddress = async (req, res) => {
-  console.log(req.body);
   const { userId, currentAddresses } = req.body;
   await User.updateOne(
     { _id: userId },
@@ -127,7 +121,6 @@ const addAddress = async (req, res) => {
   );
   User.findOne({ _id: userId }, { address: 1 })
     .then((adr) => {
-      console.log(adr);
       res.status(200).json({ address: adr.address });
     })
     .catch((err) => {
@@ -138,8 +131,6 @@ const addAddress = async (req, res) => {
 const userStatics = (req, res) => {
   const date = new Date();
   const lastYear = new Date(date.setFullYear(date.getFullYear() - 1));
-  console.log(date);
-  console.log(lastYear);
   User.aggregate([
     {
       $match: {

@@ -21,7 +21,7 @@ const registerUser = async (req, res) => {
     });
 
     const newUser = new User({ name, email, phone, password });
-    console.log(newUser);
+
     await newUser.save((error, user) => {
       if (error) {
         res.status(400).json({ errorMessage: "Something went wrong" });

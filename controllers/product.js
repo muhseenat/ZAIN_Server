@@ -10,7 +10,6 @@ const addProduct = async (req, res) => {
     const url = [];
 
     const files = req.files;
-    console.log(files);
     for (const file of files) {
       const { path } = file;
 
@@ -20,7 +19,6 @@ const addProduct = async (req, res) => {
           folder: "E-Commerce",
         })
         .then((result) => {
-          console.log(result);
           url.push({ url: result.url, id: result.public_id });
           console.log(url);
         });
@@ -28,7 +26,6 @@ const addProduct = async (req, res) => {
 
     const data = JSON.parse(req.body.data);
 
-    console.log(data);
     const product = new Product({
       name: data.productName,
       slug: slugify(data.productName),
@@ -127,7 +124,7 @@ const updateProduct = async (req, res) => {
           description: data.description,
           discount: data.discount,
           quantity: data.quantity,
-          size: push(data.size), 
+          size: push(data.size),
           mainCategory: data.selectedCategory,
           subCategory: data.selectedSubCategory,
           img1: url[0],
@@ -148,9 +145,7 @@ const updateProduct = async (req, res) => {
 const createCoupon = async (req, res) => {
   const { name, discount, maxamount, couponcode, expdate, minPurchase } =
     req.body;
-  console.log(req.body);
   let couponExist = await Coupon.findOne({ code: couponcode });
-  console.log(couponExist);
   if (couponExist) {
     res.status(400).json({ errorMessage: "Coupon already exist" });
   } else {
@@ -169,7 +164,6 @@ const createCoupon = async (req, res) => {
     coupon
       .save()
       .then((resp) => {
-        console.log(resp);
         res.status(200).json({ resp });
       })
       .catch((err) => {
@@ -198,20 +192,21 @@ const getProductsName = (req, res) => {
     });
 };
 
-
-
-
 //GET PRODUCT ID
-const getProductId=(req,res)=>{
- let name =req.params.id.trim();
-  Product.findOne({$or:[{name:{$regex:name,$options:"i"}}]},{_id:1}).then((id)=>{
-   console.log(id);
-   res.status(200).json({id})
- }).catch((err)=>{
-   res.status(400).json({err})
- })
-}
-
+const getProductId = (req, res) => {
+  let name = req.params.id.trim();
+  Product.findOne(
+    { $or: [{ name: { $regex: name, $options: "i" } }] },
+    { _id: 1 }
+  )
+    .then((id) => {
+      console.log(id);
+      res.status(200).json({ id });
+    })
+    .catch((err) => {
+      res.status(400).json({ err });
+    });
+};
 
 //PRODUCT OFFER API
 const productOffer = async (req, res) => {
@@ -262,5 +257,5 @@ module.exports = {
   getProductsName,
   productOffer,
   categoryOffer,
-  getProductId
+  getProductId,
 };

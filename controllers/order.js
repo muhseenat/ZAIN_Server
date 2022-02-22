@@ -8,7 +8,6 @@ const Razorpay = require("razorpay");
 const objectId = mongoose.Types.ObjectId;
 const crypto = require("crypto");
 
-
 const razorpay = new Razorpay({
   key_id: process.env.RAZORPAY,
   key_secret: process.env.RAZORPAY_SECRET_KEY,
@@ -22,7 +21,7 @@ const addAddress = async (req, res) => {
       { _id: userId },
       {
         $push: {
-          address: {...currentAddresses,_id:objectId()},
+          address: { ...currentAddresses, _id: objectId() },
         },
       }
     );
@@ -80,15 +79,13 @@ const addAddress = async (req, res) => {
         .save()
         .then((resp) => {
           const orderId = resp._id;
-           
+
           Cart.deleteOne({ userId: objectId(userId) }).then((resp) => {
             if (method == "COD") {
               res.status(200).json({ codSuccess: true });
-            } else if(method=="Paypal"){
-              console.log('paypallll');
+            } else if (method == "Paypal") {
               res.status(200).json({ paypalSuccess: true });
-            }
-            else {
+            } else {
               const razorpayMethod = () => {
                 const options = {
                   amount: amount * 100,
@@ -96,7 +93,7 @@ const addAddress = async (req, res) => {
                   receipt: "" + orderId,
                   payment_capture: 1,
                 };
-                console.log(options);
+               
 
                 razorpay.orders
                   .create(options)
@@ -242,7 +239,7 @@ const applyCoupon = async (req, res) => {
   const { userId, couponCode } = req.body;
 
   let checkCoupon = await Coupon.findOne({ code: couponCode });
-   console.log(checkCoupon);
+
   if (checkCoupon) {
     let userExist = checkCoupon.userId.findIndex((users) => users == userId);
     console.log(userExist);
@@ -252,15 +249,12 @@ const applyCoupon = async (req, res) => {
         {
           $push: { userId: userId },
         }
-      )
-        .then((resp) => {
-         return  res.status(200).json({ checkCoupon });
-        })
-       
+      ).then((resp) => {
+        return res.status(200).json({ checkCoupon });
+      });
     } else {
       res.status(400).json({ errorMessage: "Coupon already applied" });
     }
-   
   } else {
     res.status(400).json({ errorMessage: "Invalid Coupon" });
   }

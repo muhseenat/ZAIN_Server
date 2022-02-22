@@ -34,7 +34,6 @@ const UserSchema = new mongoose.Schema(
     address: {
       type: Array,
     },
-   
   },
   { timestamps: true }
 );

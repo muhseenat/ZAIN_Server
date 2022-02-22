@@ -45,7 +45,6 @@ const getSubCategory = (req, res) => {
   console.log(req.query);
   Category.findOne({ mainCategory: req.query.main })
     .then((data) => {
-      console.log(data + "ithannnnnnn");
       console.log(data?.subCategory);
       res.json({ data: data?.subCategory || [] });
     })

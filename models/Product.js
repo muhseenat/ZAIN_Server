@@ -44,9 +44,9 @@ const ProductSchema = new Schema(
     size: {
       type: Array,
     },
-    Offer:{
-      type:Boolean,
-      default:false
+    Offer: {
+      type: Boolean,
+      default: false,
     },
     mainCategory: {
       type: String,

@@ -5,28 +5,27 @@ const CouponSchema = new mongoose.Schema(
     name: {
       type: String,
     },
-    userId:{
-        type:Array
+    userId: {
+      type: Array,
     },
     discount: {
       type: Number,
-      required:true,
+      required: true,
     },
     maxAmount: {
       type: Number,
-      required:true,
+      required: true,
     },
     minAmount: {
       type: Number,
-     
     },
     minPurchase: {
       type: Number,
-      required:true,
+      required: true,
     },
     code: {
       type: String,
-      required:true,
+      required: true,
     },
     expire: {
       type: Date,
@@ -34,11 +33,9 @@ const CouponSchema = new mongoose.Schema(
     expireAt: {
       type: Date,
       default: Date.now,
-     
     },
   },
   { timestamps: true }
-
 );
 // CouponSchema.createIndex({"expireAt":1},{expireAfterSeconds:0})
 module.exports = mongoose.model("Coupon", CouponSchema);
