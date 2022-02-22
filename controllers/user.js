@@ -98,17 +98,19 @@ const updateAddress = async (req, res) => {
   console.log(req.body);
   const { userId, currentAddresses } = req.body;
 
-  User.updateOne(
+ await User.updateOne(
     { _id: objectId(userId) ,
-     "address._id": objectId(currentAddresses._id) },
+     "address._id": currentAddresses._id },
     { $set: { "address.$": currentAddresses } }
   )
-    .then((result) => {
-      console.log(result);
-    })
-    .catch((err) => {
-      console.log(err);
-    });
+  User.findOne({ _id: userId }, { address: 1 })
+  .then((adr) => {
+    console.log(adr);
+    res.status(200).json({ address: adr.address });
+  })
+  .catch((err) => {
+    res.status(400).json({ err });
+  });
 };
 
 //ADD ADDRESS API
