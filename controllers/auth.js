@@ -125,7 +125,8 @@ const otpVerify = (req, res) => {
   
 
   User.findOne({ phone }).exec((error, user) => {
-   
+   console.log(phone);
+   console.log(otp);
     if (error) return res.status(400).json({ error });
     console.log("thappi kayinj");
     if (user) {
@@ -137,7 +138,9 @@ const otpVerify = (req, res) => {
           code: otp,
         })
         .then((resp) => {
-          console.log(resp + "ithannn otp responce........");
+          console.log(resp);
+          console.log('response ind');
+          console.log(resp.valid);
           if (resp.valid) {
             const token = jwt.sign(
               { user: user._id },
@@ -146,7 +149,7 @@ const otpVerify = (req, res) => {
             console.log(token + "login time token");
             console.log(user);
             let user=user.name;
-            return res.status(200).json({ token, user });
+           res.status(200).json({ token, user });
           }
         })
         .catch((error) => {

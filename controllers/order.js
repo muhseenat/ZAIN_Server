@@ -21,7 +21,7 @@ const addAddress = async (req, res) => {
       { _id: userId },
       {
         $push: {
-          address: currentAddresses,
+          address: {...currentAddresses,_id:objectId()},
         },
       }
     );
