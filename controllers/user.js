@@ -1,8 +1,9 @@
 const { isValidObjectId } = require("mongoose");
 const User = require("../models/User");
 const mongoose = require("mongoose");
-
 const objectId = mongoose.Types.ObjectId;
+
+
 //GET USERS API
 const getUser = (req, res) => {
   User.find({})
@@ -15,7 +16,7 @@ const getUser = (req, res) => {
     });
 };
 
-//GET LATEST USER
+//GET LATEST USERS
 const latestMembers=(req,res)=>{
   User.find({}).sort({createdAt:-1}).limit(5)
     .then((users) => {
@@ -33,6 +34,7 @@ const latestMembers=(req,res)=>{
 const getSpecificUser = (req, res) => {
   User.findOne({ _id: req.params.id })
     .then((resp) => {
+      console.log();
       res.status(200).json({ resp });
     })
     .catch((err) => {
@@ -73,23 +75,7 @@ const updateUser = (req, res) => {
 };
 
 
-///serach params not working......
 
-const searchUser = (req, res) => {
-  const search = req.params.search;
-  console.log(search);
-  let keyword =
-    search == "nofilter" ? {} : { name: { $regex: search, $option: "i" } };
-  console.log(keyword);
-
-  User.find(keyword)
-    .then((resp) => {
-      res.status(200).json({ resp });
-    })
-    .catch((err) => {
-      res.status(400).json({ err });
-    });
-};
 
 // BLOCK USER API
 const blockUser=async(req,res)=>{
@@ -195,7 +181,6 @@ const userStatics=(req,res)=>{
 
 module.exports = {
   getUser,
-  searchUser,
   getSpecificUser,
   deleteUser,
   updateUser,

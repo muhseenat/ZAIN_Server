@@ -139,7 +139,7 @@ const verifyPayment = (req, res) => {
       { _id: objectId(order.data.receipt) },
       {
         $set: {
-          status: "paid",
+          status: "placed",
         },
       }
     )
