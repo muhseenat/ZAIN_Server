@@ -7,6 +7,7 @@ const objectId = mongoose.Types.ObjectId;
 // ADD TO CART
 const addToCart = async (req, res) => {
   const { userId, proId } = req.body;
+  console.log(userId, proId );
   let proObj = { item: objectId(proId), quantity: 1 };
 
   let userCart = await Cart.findOne({ userId: objectId(userId) });

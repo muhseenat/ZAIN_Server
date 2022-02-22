@@ -80,11 +80,15 @@ const addAddress = async (req, res) => {
         .save()
         .then((resp) => {
           const orderId = resp._id;
-
+           
           Cart.deleteOne({ userId: objectId(userId) }).then((resp) => {
             if (method == "COD") {
               res.status(200).json({ codSuccess: true });
-            } else {
+            } else if(method=="Paypal"){
+              console.log('paypallll');
+              res.status(200).json({ paypalSuccess: true });
+            }
+            else {
               const razorpayMethod = () => {
                 const options = {
                   amount: amount * 100,

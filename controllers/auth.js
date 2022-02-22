@@ -116,7 +116,7 @@ const otpVerify = (req, res) => {
               process.env.JWT_SECRET_KEY
             );
 
-            res.status(200).json({ token, user: user.name });
+            res.status(200).json({ token, user });
           }
         })
         .catch((error) => {
