@@ -8,6 +8,7 @@ const Razorpay = require("razorpay");
 const objectId = mongoose.Types.ObjectId;
 const crypto = require("crypto");
 
+
 const razorpay = new Razorpay({
   key_id: process.env.RAZORPAY,
   key_secret: process.env.RAZORPAY_SECRET_KEY,
@@ -237,10 +238,10 @@ const applyCoupon = async (req, res) => {
   const { userId, couponCode } = req.body;
 
   let checkCoupon = await Coupon.findOne({ code: couponCode });
-
+   console.log(checkCoupon);
   if (checkCoupon) {
     let userExist = checkCoupon.userId.findIndex((users) => users == userId);
-
+    console.log(userExist);
     if (userExist == -1) {
       Coupon.updateOne(
         { code: couponCode },
@@ -249,16 +250,13 @@ const applyCoupon = async (req, res) => {
         }
       )
         .then((resp) => {
-          res.status(200).json({ checkCoupon });
+         return  res.status(200).json({ checkCoupon });
         })
-        .catch((err) => {
-          console.log(err);
-          res.status(400);
-        });
+       
     } else {
       res.status(400).json({ errorMessage: "Coupon already applied" });
     }
-    res.status(200).json({ checkCoupon });
+   
   } else {
     res.status(400).json({ errorMessage: "Invalid Coupon" });
   }
