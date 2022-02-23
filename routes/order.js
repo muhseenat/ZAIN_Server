@@ -6,6 +6,7 @@ router.post("/create", orderControllers.addAddress);
 router.get("/getaddress/:id", orderControllers.getAddress);
 router.get("/getorders", orderControllers.getOrders);
 router.put("/changestatus", orderControllers.changeStatus);
+router.put("/delivered-status", orderControllers.deliveredStatus);
 router.post("/verifypayment", orderControllers.verifyPayment);
 router.get("/order-history/:id", orderControllers.orderHistory);
 router.post("/apply-coupon", orderControllers.applyCoupon);

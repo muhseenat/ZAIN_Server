@@ -64,6 +64,8 @@ const addAddress = async (req, res) => {
           product: resp.product.name,
           price: resp.product.price * resp.quantity,
           status: "placed",
+          delivered: "", //changed now
+          shipped: "",
           image: resp.product.img1[0].url,
         });
       });
@@ -73,6 +75,7 @@ const addAddress = async (req, res) => {
         address: currentAddresses,
         products: product,
         method: method,
+
         date: new Date(),
       });
       order
@@ -183,22 +186,58 @@ const getOrders = (req, res) => {
 // STATUS CHANGE API
 const changeStatus = async (req, res) => {
   const { status, orderId, prodId } = req.body;
+  if (status === "shipped") {
+    await Order.updateOne(
+      { _id: objectId(orderId), "products.id": objectId(prodId) },
+      {
+        $set: { "products.$.status": status, "products.$.shipped": new Date() },
+      }
+    )
+      .then((resp) => {
+        res.status(200).json({ resp });
+      })
+      .catch((err) => {
+        res.status(400).json({ err });
+      });
+  } else if (status === "delivered") {
+    await Order.updateOne(
+      { _id: objectId(orderId), "products.id": objectId(prodId) },
+      {
+        $set: {
+          "products.$.status": status,
+          "products.$.delivered": new Date(),
+        },
+      }
+    )
+      .then((resp) => {
+        res.status(200).json({ resp });
+      })
+      .catch((err) => {
+        res.status(400).json({ err });
+      });
+  } else {
+    await Order.updateOne(
+      { _id: objectId(orderId), "products.id": objectId(prodId) },
+      { $set: { "products.$.status": status } }
+    )
+      .then((resp) => {
+        res.status(200).json({ resp });
+      })
+      .catch((err) => {
+        res.status(400).json({ err });
+      });
+  }
+};
 
-  await Order.updateOne(
-    { _id: objectId(orderId), "products.id": objectId(prodId) },
-    { $set: { "products.$.status": status } }
-  )
-    .then((resp) => {
-      res.status(200).json({ resp });
-    })
-    .catch((err) => {
-      res.status(400).json({ err });
-    });
+//DELIVERED STATUS API
+
+const deliveredStatus = (req, res) => {
+  const { status, orderId, prodId } = req.body;
 };
 
 //CANCEL ORDER API
 const cancelProduct = async () => {
-  const { userId, orderId, proId } = req.body;
+  const { id, orderId, proId } = req.body;
   await Order.updateOne(
     { _id: objectId(orderId), "products.id": objectId(proId) },
     { $set: { "products.$.status": "Cancelled" } }
@@ -206,7 +245,7 @@ const cancelProduct = async () => {
 
   Order.aggregate([
     {
-      $match: { userId: userId },
+      $match: { userId: id },
     },
     {
       $unwind: "$products",
@@ -371,6 +410,7 @@ module.exports = {
   getOrders,
   orderHistory,
   changeStatus,
+  deliveredStatus,
   verifyPayment,
   applyCoupon,
   salesReport,
