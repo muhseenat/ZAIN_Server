@@ -7,6 +7,8 @@ const Razorpay = require("razorpay");
 
 const objectId = mongoose.Types.ObjectId;
 const crypto = require("crypto");
+const { log } = require("console");
+
 
 const razorpay = new Razorpay({
   key_id: process.env.RAZORPAY,
@@ -399,15 +401,60 @@ const dailyReport=(req,res)=>{
 }
 
 //GET WEEKLY REPORT
-const weeklyReport=()=>{
+const weeklyReport=(req,res)=>{
 
   let day = new Date().getDay();
+  console.log(day);
+  if (day==0){
+    day=7;
+  }else if (day==1){
+    day =2
+  }
+  
+  let nowDate = new Date(Date.now()-day*24*60*60*1000)
+  let date = new Date(nowDate.setHours(0,0,0,0)).toISOString()
+  console.log(date);
+  console.log(nowDate);
+  console.log(Date.now());
 
+  Order.aggregate([
+    { $unwind: "$products" },
+    {
+      $match: {
+        "products.status": "delivered",
+         "products.delivered":{$gte:new Date(date)},
+      },
+    },
+  ]).then((report)=>{
+    console.log(report);
+    res.status(200).json({report})
+  }).catch((err)=>{
+    res.status(400).json({err})
+  })
 
 }
 //GET MONTHLY REPORT
 
-const monthlyReport=()=>{
+const monthlyReport=(req,res)=>{
+   let month = new Date();
+   let firstMonth = new Date(month.getFullYear(),month.getMonth(),1)
+   let date = new Date(firstMonth.setHours(0,0,0,0)).toISOString()
+
+   
+  Order.aggregate([
+    { $unwind: "$products" },
+    {
+      $match: {
+        "products.status": "delivered",
+         "products.delivered":{$gte:new Date(date)},
+      },
+    },
+  ]).then((report)=>{
+    console.log(report);
+    res.status(200).json({report})
+  }).catch((err)=>{
+    res.status(400).json({err})
+  })
 
 }
 //GET YEARLY REPORT
