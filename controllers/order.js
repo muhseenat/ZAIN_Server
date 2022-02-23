@@ -93,7 +93,6 @@ const addAddress = async (req, res) => {
                   receipt: "" + orderId,
                   payment_capture: 1,
                 };
-               
 
                 razorpay.orders
                   .create(options)
@@ -197,11 +196,35 @@ const changeStatus = async (req, res) => {
     });
 };
 
+//CANCEL ORDER API
+const cancelProduct = async () => {
+  const { userId, orderId, proId } = req.body;
+  await Order.updateOne(
+    { _id: objectId(orderId), "products.id": objectId(proId) },
+    { $set: { "products.$.status": "Cancelled" } }
+  );
+
+  Order.aggregate([
+    {
+      $match: { userId: userId },
+    },
+    {
+      $unwind: "$products",
+    },
+  ])
+    .then((order) => {
+      res.status(200).json({ order });
+    })
+    .catch((err) => {
+      res.staus(400).json({ err });
+    });
+};
+
 //GET ORDER HISTORY API
-const orderHistory = async (req, res) => {
+const orderHistory = (req, res) => {
   const id = req.params.id;
 
-  await Order.aggregate([
+  Order.aggregate([
     {
       $match: { userId: id },
     },
@@ -355,4 +378,5 @@ module.exports = {
   latestOrders,
   monthlyIncome,
   totalCount,
+  cancelProduct,
 };

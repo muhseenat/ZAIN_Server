@@ -14,4 +14,5 @@ router.post("/get-filter-report", orderControllers.filteredReport);
 router.get("/get-latest-orders", orderControllers.latestOrders);
 router.get("/get-income", orderControllers.monthlyIncome);
 router.get("/get-total-orders", orderControllers.totalCount);
+router.put("/cancel-order",orderControllers.cancelProduct);
 module.exports = router;
