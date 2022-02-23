@@ -236,13 +236,14 @@ const deliveredStatus = (req, res) => {
 };
 
 //CANCEL ORDER API
-const cancelProduct = async () => {
+const cancelProduct = async (req,res) => {
   const { id, orderId, proId } = req.body;
-  await Order.updateOne(
+  console.log(id,orderId,proId);
+ let resp= await Order.updateOne(
     { _id: objectId(orderId), "products.id": objectId(proId) },
     { $set: { "products.$.status": "Cancelled" } }
   );
-
+  console.log(resp);
   Order.aggregate([
     {
       $match: { userId: id },
@@ -278,6 +279,26 @@ const orderHistory = (req, res) => {
       res.staus(400).json({ err });
     });
 };
+//GET SINGLE ORDERED PRODUCT DETAILS
+const OrderedProduct=(req,res)=>{
+ const {orderId,proId} = req.body
+ Order.aggregate([
+  {
+    $match: { _id:orderId },
+  },
+  {
+    $unwind: "$products",
+  },
+  {
+    $match:{"$products.$.id":objectId(proId)}
+  }
+]).then((resp)=>{
+  console.log(resp);
+}).catch((err)=>{
+  console.log(err);
+})
+}
+
 
 //GET LATEST ORDERS API
 const latestOrders = (req, res) => {
@@ -409,6 +430,7 @@ module.exports = {
   getAddress,
   getOrders,
   orderHistory,
+  OrderedProduct,
   changeStatus,
   deliveredStatus,
   verifyPayment,
