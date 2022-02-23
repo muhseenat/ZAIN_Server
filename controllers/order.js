@@ -9,7 +9,6 @@ const objectId = mongoose.Types.ObjectId;
 const crypto = require("crypto");
 const { log } = require("console");
 
-
 const razorpay = new Razorpay({
   key_id: process.env.RAZORPAY,
   key_secret: process.env.RAZORPAY_SECRET_KEY,
@@ -238,10 +237,10 @@ const deliveredStatus = (req, res) => {
 };
 
 //CANCEL ORDER API
-const cancelProduct = async (req,res) => {
+const cancelProduct = async (req, res) => {
   const { id, orderId, proId } = req.body;
-  console.log(id,orderId,proId);
- let resp= await Order.updateOne(
+  console.log(id, orderId, proId);
+  let resp = await Order.updateOne(
     { _id: objectId(orderId), "products.id": objectId(proId) },
     { $set: { "products.$.status": "Cancelled" } }
   );
@@ -282,25 +281,26 @@ const orderHistory = (req, res) => {
     });
 };
 //GET SINGLE ORDERED PRODUCT DETAILS
-const OrderedProduct=(req,res)=>{
- const {orderId,proId} = req.body
- Order.aggregate([
-  {
-    $match: { _id:orderId },
-  },
-  {
-    $unwind: "$products",
-  },
-  {
-    $match:{"$products.$.id":objectId(proId)}
-  }
-]).then((resp)=>{
-  console.log(resp);
-}).catch((err)=>{
-  console.log(err);
-})
-}
-
+const OrderedProduct = (req, res) => {
+  const { orderId, proId } = req.body;
+  Order.aggregate([
+    {
+      $match: { _id: orderId },
+    },
+    {
+      $unwind: "$products",
+    },
+    {
+      $match: { "$products.$.id": objectId(proId) },
+    },
+  ])
+    .then((resp) => {
+      console.log(resp);
+    })
+    .catch((err) => {
+      console.log(err);
+    });
+};
 
 //GET LATEST ORDERS API
 const latestOrders = (req, res) => {
@@ -381,38 +381,38 @@ const filteredReport = (req, res) => {
     });
 };
 //GET DAILY SALES REPORT
-const dailyReport=(req,res)=>{
-  let today=new Date();
-  today=new Date(today.setHours(0,0,0,0)).toISOString();
+const dailyReport = (req, res) => {
+  let today = new Date();
+  today = new Date(today.setHours(0, 0, 0, 0)).toISOString();
   Order.aggregate([
     { $unwind: "$products" },
     {
       $match: {
         "products.status": "delivered",
-         "products.delivered":{$gte:new Date(today)},
+        "products.delivered": { $gte: new Date(today) },
       },
     },
-  ]).then((report)=>{
-    res.status(200).json({report})
-  }).catch((err)=>{
-    res.status(400).json({err})
-  })
-
-}
+  ])
+    .then((report) => {
+      res.status(200).json({ report });
+    })
+    .catch((err) => {
+      res.status(400).json({ err });
+    });
+};
 
 //GET WEEKLY REPORT
-const weeklyReport=(req,res)=>{
-
+const weeklyReport = (req, res) => {
   let day = new Date().getDay();
   console.log(day);
-  if (day==0){
-    day=7;
-  }else if (day==1){
-    day =2
+  if (day == 0) {
+    day = 7;
+  } else if (day == 1) {
+    day = 2;
   }
-  
-  let nowDate = new Date(Date.now()-day*24*60*60*1000)
-  let date = new Date(nowDate.setHours(0,0,0,0)).toISOString()
+
+  let nowDate = new Date(Date.now() - day * 24 * 60 * 60 * 1000);
+  let date = new Date(nowDate.setHours(0, 0, 0, 0)).toISOString();
   console.log(date);
   console.log(nowDate);
   console.log(Date.now());
@@ -422,69 +422,62 @@ const weeklyReport=(req,res)=>{
     {
       $match: {
         "products.status": "delivered",
-         "products.delivered":{$gte:new Date(date)},
+        "products.delivered": { $gte: new Date(date) },
       },
     },
-  ]).then((report)=>{
-    console.log(report);
-    res.status(200).json({report})
-  }).catch((err)=>{
-    res.status(400).json({err})
-  })
-
-}
+  ])
+    .then((report) => {
+      res.status(200).json({ report });
+    })
+    .catch((err) => {
+      res.status(400).json({ err });
+    });
+};
 //GET MONTHLY REPORT
 
-const monthlyReport=(req,res)=>{
-   let month = new Date();
-   let firstMonth = new Date(month.getFullYear(),month.getMonth(),1)
-   let date = new Date(firstMonth.setHours(0,0,0,0)).toISOString()
+const monthlyReport = (req, res) => {
+  let month = new Date();
+  let firstMonth = new Date(month.getFullYear(), month.getMonth(), 1);
+  let date = new Date(firstMonth.setHours(0, 0, 0, 0)).toISOString();
 
-   
   Order.aggregate([
     { $unwind: "$products" },
     {
       $match: {
         "products.status": "delivered",
-         "products.delivered":{$gte:new Date(date)},
+        "products.delivered": { $gte: new Date(date) },
       },
     },
-  ]).then((report)=>{
-    console.log(report);
-    res.status(200).json({report})
-  }).catch((err)=>{
-    res.status(400).json({err})
-  })
-
-}
+  ])
+    .then((report) => {
+      res.status(200).json({ report });
+    })
+    .catch((err) => {
+      res.status(400).json({ err });
+    });
+};
 //GET YEARLY REPORT
-const yearlyReport=(req,res)=>{
-    
- let currentYear= new Date().getFullYear()
- currentYear=currentYear+"-"+"01-01"
- console.log(currentYear);
- currentYear=new Date(currentYear);
- console.log(currentYear);
- const date = new Date(currentYear).toISOString
- Order.aggregate([
-  { $unwind: "$products" },
-  {
-    $match: {
-      "products.status": "delivered",
-       "products.delivered":{$gte:new Date(date)},
+const yearlyReport = (req, res) => {
+  let currentYear = new Date().getFullYear();
+  currentYear = currentYear + "-" + "01-01";
+  currentYear = new Date(currentYear);
+  const date = new Date(currentYear).toISOString;
+  Order.aggregate([
+    { $unwind: "$products" },
+    {
+      $match: {
+        "products.status": "delivered",
+        "products.delivered": { $gte: new Date(date) },
+      },
     },
-  },
-]).then((report)=>{
-  console.log(report);
-  res.status(200).json({report})
-}).catch((err)=>{
-  res.status(400).json({err})
-})
-
-
-
-}
-
+  ])
+    .then((report) => {
+      res.status(200).json({ report });
+    })
+    .catch((err) => {
+      res.status(400).json({ err });
+    });
+};
 
 // GET MONTHLY INCOME
 const monthlyIncome = (req, res) => {
@@ -552,5 +545,5 @@ module.exports = {
   dailyReport,
   weeklyReport,
   monthlyReport,
-  yearlyReport
+  yearlyReport,
 };
