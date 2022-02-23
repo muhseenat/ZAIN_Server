@@ -230,21 +230,15 @@ const changeStatus = async (req, res) => {
   }
 };
 
-//DELIVERED STATUS API
 
-const deliveredStatus = (req, res) => {
-  const { status, orderId, prodId } = req.body;
-};
 
 //CANCEL ORDER API
 const cancelProduct = async (req, res) => {
   const { id, orderId, proId } = req.body;
-  console.log(id, orderId, proId);
   let resp = await Order.updateOne(
     { _id: objectId(orderId), "products.id": objectId(proId) },
     { $set: { "products.$.status": "Cancelled" } }
   );
-  console.log(resp);
   Order.aggregate([
     {
       $match: { userId: id },
@@ -280,27 +274,7 @@ const orderHistory = (req, res) => {
       res.staus(400).json({ err });
     });
 };
-//GET SINGLE ORDERED PRODUCT DETAILS
-const OrderedProduct = (req, res) => {
-  const { orderId, proId } = req.body;
-  Order.aggregate([
-    {
-      $match: { _id: orderId },
-    },
-    {
-      $unwind: "$products",
-    },
-    {
-      $match: { "$products.$.id": objectId(proId) },
-    },
-  ])
-    .then((resp) => {
-      console.log(resp);
-    })
-    .catch((err) => {
-      console.log(err);
-    });
-};
+
 
 //GET LATEST ORDERS API
 const latestOrders = (req, res) => {
@@ -404,7 +378,6 @@ const dailyReport = (req, res) => {
 //GET WEEKLY REPORT
 const weeklyReport = (req, res) => {
   let day = new Date().getDay();
-  console.log(day);
   if (day == 0) {
     day = 7;
   } else if (day == 1) {
@@ -413,9 +386,7 @@ const weeklyReport = (req, res) => {
 
   let nowDate = new Date(Date.now() - day * 24 * 60 * 60 * 1000);
   let date = new Date(nowDate.setHours(0, 0, 0, 0)).toISOString();
-  console.log(date);
-  console.log(nowDate);
-  console.log(Date.now());
+
 
   Order.aggregate([
     { $unwind: "$products" },
@@ -531,9 +502,7 @@ module.exports = {
   getAddress,
   getOrders,
   orderHistory,
-  OrderedProduct,
   changeStatus,
-  deliveredStatus,
   verifyPayment,
   applyCoupon,
   salesReport,
