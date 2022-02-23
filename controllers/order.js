@@ -458,7 +458,30 @@ const monthlyReport=(req,res)=>{
 
 }
 //GET YEARLY REPORT
-const yearlyReport=()=>{
+const yearlyReport=(req,res)=>{
+    
+ let currentYear= new Date().getFullYear()
+ currentYear=currentYear+"-"+"01-01"
+ console.log(currentYear);
+ currentYear=new Date(currentYear);
+ console.log(currentYear);
+ const date = new Date(currentYear).toISOString
+ Order.aggregate([
+  { $unwind: "$products" },
+  {
+    $match: {
+      "products.status": "delivered",
+       "products.delivered":{$gte:new Date(date)},
+    },
+  },
+]).then((report)=>{
+  console.log(report);
+  res.status(200).json({report})
+}).catch((err)=>{
+  res.status(400).json({err})
+})
+
+
 
 }
 
