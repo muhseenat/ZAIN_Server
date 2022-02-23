@@ -17,7 +17,7 @@ const app = express();
 
 db.dbConnect(process.env.MDB_CONNECT);
 
-app.use(cors({ origin: ["http://localhost:3000"] }));
+app.use(cors({ origin: ["http://localhost:3001"] }));
 
 app.use(logger("dev"));
 app.use(express.json());

@@ -11,10 +11,14 @@ router.post("/verifypayment", orderControllers.verifyPayment);
 router.get("/order-history/:id", orderControllers.orderHistory);
 router.post("/apply-coupon", orderControllers.applyCoupon);
 router.get("/get-sales-report", orderControllers.salesReport);
+router.get("/get-daily-report", orderControllers.dailyReport);
+router.get("/get-weekly-report", orderControllers.weeklyReport);
+router.get("/get-monthly-report", orderControllers.monthlyReport);
+router.get("/get-yearly-report", orderControllers.yearlyReport);
 router.post("/get-filter-report", orderControllers.filteredReport);
 router.get("/get-latest-orders", orderControllers.latestOrders);
 router.get("/get-income", orderControllers.monthlyIncome);
 router.get("/get-total-orders", orderControllers.totalCount);
 router.put("/cancel-product",orderControllers.cancelProduct);
-router.get('/ordered-product',orderControllers.OrderedProduct)
+router.get('/ordered-product',orderControllers.OrderedProduct);
 module.exports = router;

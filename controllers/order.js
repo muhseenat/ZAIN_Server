@@ -64,8 +64,8 @@ const addAddress = async (req, res) => {
           product: resp.product.name,
           price: resp.product.price * resp.quantity,
           status: "placed",
-          delivered: "", //changed now
-          shipped: "",
+          delivered: null,
+          shipped: null,
           image: resp.product.img1[0].url,
         });
       });
@@ -378,6 +378,44 @@ const filteredReport = (req, res) => {
       res.status(400).json({ err });
     });
 };
+//GET DAILY SALES REPORT
+const dailyReport=(req,res)=>{
+  let today=new Date();
+  today=new Date(today.setHours(0,0,0,0)).toISOString();
+  Order.aggregate([
+    { $unwind: "$products" },
+    {
+      $match: {
+        "products.status": "delivered",
+         "products.delivered":{$gte:new Date(today)},
+      },
+    },
+  ]).then((report)=>{
+    res.status(200).json({report})
+  }).catch((err)=>{
+    res.status(400).json({err})
+  })
+
+}
+
+//GET WEEKLY REPORT
+const weeklyReport=()=>{
+
+  let day = new Date().getDay();
+
+
+}
+//GET MONTHLY REPORT
+
+const monthlyReport=()=>{
+
+}
+//GET YEARLY REPORT
+const yearlyReport=()=>{
+
+}
+
+
 // GET MONTHLY INCOME
 const monthlyIncome = (req, res) => {
   const date = new Date();
@@ -441,4 +479,8 @@ module.exports = {
   monthlyIncome,
   totalCount,
   cancelProduct,
+  dailyReport,
+  weeklyReport,
+  monthlyReport,
+  yearlyReport
 };
