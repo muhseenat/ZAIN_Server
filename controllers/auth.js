@@ -1,8 +1,9 @@
 const User = require("../models/User");
 const jwt = require("jsonwebtoken");
-const serviceSID = "VAe59dd7b63ff9cf8cb4edbbb3e3861181";
-const accountSID = "AC446a96938c974832f639def16975ba75";
-const authToken = "d69abd11d90c7a95664a22d619f8311c";
+const accountSID = process.env.TWILIO_accountSID;
+const serviceSID = process.env.TWILIO_serviceSID;
+const authToken = process.env.TWILIO_authToken;
+
 const client = require("twilio")(accountSID, authToken);
 
 //User Register API
