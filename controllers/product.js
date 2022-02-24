@@ -5,7 +5,6 @@ const cloudinary = require("../config/cloudinary");
 
 const addProduct = async (req, res) => {
   try {
-    console.log(req.files);
 
     const url = [];
 
@@ -20,7 +19,6 @@ const addProduct = async (req, res) => {
         })
         .then((result) => {
           url.push({ url: result.url, id: result.public_id });
-          console.log(url);
         });
     }
 
@@ -216,10 +214,9 @@ const productOffer = async (req, res) => {
   product
     .updateOne({ discount: discount }, { offer: true })
     .then((resp) => {
-      res.status(200);
+      res.status(200).json({resp})
     })
     .catch((err) => {
-      console.log(err);
       res.status(400).json({ err });
     });
 };
@@ -228,7 +225,6 @@ const productOffer = async (req, res) => {
 
 const categoryOffer = (req, res) => {
   const { selectedSubCategory, discount } = req.body;
-  console.log(req.body);
   Product.updateMany(
     {
       $and: [{ subCategory: selectedSubCategory }, { offer: false }],

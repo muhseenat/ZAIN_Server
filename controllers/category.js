@@ -20,7 +20,7 @@ const createCategory = (req, res) => {
 const getCategory = (req, res) => {
   Category.find({})
     .then((data) => {
-      res.json({ data });
+      res.status(200).json({ data });
     })
     .catch((err) => {
       res.status(400).json({ err });
@@ -28,13 +28,13 @@ const getCategory = (req, res) => {
 };
 
 const deleteCategory = (req, res) => {
-  Category.update(
+  Category.updateOne(
     { _id: objectId(req.params.id) },
     { $pull: { subCategory: req.params.sub } }
   )
     .then(async () => {
       const data = await Category.find({});
-      res.json({ data });
+      res.status(200).json({ data });
     })
     .catch((err) => {
       console.log(err);
@@ -42,10 +42,8 @@ const deleteCategory = (req, res) => {
 };
 
 const getSubCategory = (req, res) => {
-  console.log(req.query);
   Category.findOne({ mainCategory: req.query.main })
     .then((data) => {
-      console.log(data?.subCategory);
       res.json({ data: data?.subCategory || [] });
     })
     .catch((err) => {
