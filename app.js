@@ -17,7 +17,15 @@ const app = express();
 
 db.dbConnect(process.env.MDB_CONNECT);
 
-app.use(cors({ origin: ["http://localhost:3000","https://shop.muhseena.tech"] }));
+app.use(
+  cors({
+    origin: [
+      "http://localhost:3000",
+      "https://shop.muhseena.tech",
+      "https://admin.muhseena.tech",
+    ],
+  })
+);
 
 app.use(logger("dev"));
 app.use(express.json());
